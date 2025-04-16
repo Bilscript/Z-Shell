@@ -55,7 +55,7 @@ void tokenize(char *input, size_t *i, t_token **tokens)
 	if (input[*i] == '|')
 		add_token(tokens, new_token(TOKEN_PIPE, &input[(*i)++], 1, QUOTE_NONE));
 /* 	if (input[*i] == '$')
-		token dollar  */
+		token_dollar()  */
 	else if (input[*i] == '<')
 	{
 		if (input[*i + 1] == '<')

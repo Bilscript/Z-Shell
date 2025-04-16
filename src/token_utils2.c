@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   token_utils2.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
+/*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 12:14:09 by slebik            #+#    #+#             */
-/*   Updated: 2025/04/15 15:39:53 by slebik           ###   ########.fr       */
+/*   Updated: 2025/04/16 11:10:56 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ void parse_double_quote(char *input, size_t *i, t_token **tokens)
 		(*i)++;
 	}
 	else
-		printf("Syntax error: unclosed quote\n");
+		printf("\033[0;31mSyntax error: unclosed quote\033[0m\n");
 }
 
 void parse_simple_quote(char *input, size_t *i, t_token **tokens)
@@ -45,7 +45,7 @@ void parse_simple_quote(char *input, size_t *i, t_token **tokens)
 		(*i)++;
 	}
 	else
-		printf("Syntax error: unclosed quote\n");
+		printf("\033[0;31mSyntax error: unclosed quote\033[0m\n");
 }
 
 char	*get_env_variable(char **envp, char *token_value, t_quote_status quote_status)
@@ -67,7 +67,7 @@ char	*get_env_variable(char **envp, char *token_value, t_quote_status quote_stat
 				return (envp[i] + len + 1);
 			i++;
 		}
-		perror("variable not found");
+		perror("\033[0;31mvariable not found\033[0m\n");
 		return (NULL);
 	}
 	else
