@@ -15,7 +15,7 @@
 void add_token(t_token **src, t_token *dest)
 {
 	t_token *tmp;
-	
+
 	if (!*src)
 		*src = dest;
 	else
@@ -46,7 +46,7 @@ t_token *new_token(t_token_type namecode, char* start, size_t len, t_quote_statu
 
 	new = malloc(sizeof(t_token));
 	new->type = namecode;
-	new->value = strndup(start, len);
+	new->value = strndup(start, len); //ft 
 	new->quote_status = quote_status;
 	new->next = NULL;
 	return (new);

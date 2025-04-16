@@ -28,7 +28,7 @@ void token_dollar(char *input, size_t *i, t_token **tokens, char **envp, t_quote
 	char *tmp;
 	char *value;
 
-	start = *i
+	start = *i;
 	(*i)++;
 	while (input[*i] && (ft_isalnum(input[*i]) || input[*i] == '_'))
 		(*i)++;
