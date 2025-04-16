@@ -29,33 +29,32 @@ void token_word(char *input, size_t *i, t_token **tokens)
 	size_t	start;
 
 	start = *i;
-	while (input[*i] && !isspace(input[*i]) && !is_special(input[*i]))
+	while (input[*i] && !ft_isspace(input[*i]) && !is_special(input[*i]))
 		(*i)++;
 	add_token(tokens, new_token(TOKEN_WORD, &input[start], *i - start, QUOTE_NONE));
 }
-/* void token_dollar(char *input, size_t *i, t_token **tokens, char **envp)
+
+void token_dollar(char *input, size_t *i, t_token **tokens, char **envp)
 {
 	size_t start = *i;
-	char *raw;
+	char *tmp;
 	char *value;
 	(*i)++;
-	while (input[*i] && (isalnum(input[*i]) || input[*i] == '_'))
+	while (input[*i] && (ft_isalnum(input[*i]) || input[*i] == '_'))
 		(*i)++;
-	raw = strndup(&input[start], *i - start);
-	value = get_env_variable(envp, raw, QUOTE_NONE); // ou je passe un quote_status réel
-	free(raw);
-
+	tmp = strndup(&input[start], *i - start); // ft  $USER
+	value = get_env_variable(envp, tmp, QUOTE_NONE); // ou je passe un quote_status réel
+	free(tmp);
 	if (value)
-		add_token(tokens, new_token(TOKEN_WORD, value, strlen(value), QUOTE_NONE));
-} */
+		add_token(tokens, new_token(TOKEN_WORD, value, ft_strlen(value), QUOTE_NONE));
+}
 
-
-void tokenize(char *input, size_t *i, t_token **tokens)
+void tokenize(char *input, size_t *i, t_token **tokens, char **envp)
 {
 	if (input[*i] == '|')
 		add_token(tokens, new_token(TOKEN_PIPE, &input[(*i)++], 1, QUOTE_NONE));
-/* 	if (input[*i] == '$')
-		token_dollar()  */
+	else if (input[*i] == '$')
+		token_dollar(input, i, tokens, envp);
 	else if (input[*i] == '<')
 	{
 		if (input[*i + 1] == '<')
@@ -78,7 +77,7 @@ void tokenize(char *input, size_t *i, t_token **tokens)
 		token_word(input, i, tokens);
 }
 
-t_token *tokenizer(char *input)
+t_token *tokenizer(char *input, char **envp)
 {
 	t_token *tokens;
 	size_t i;
@@ -92,7 +91,7 @@ t_token *tokenizer(char *input)
 			i++;
 			continue ;
 		}
-		tokenize(input, &i, &tokens);
+		tokenize(input, &i, &tokens, envp);
 	}
 	return tokens;
 }

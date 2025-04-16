@@ -8,9 +8,9 @@ CC			:= gcc
 CFLAGS		:= -Wall -Wextra -Werror -I$(LIBFT_DIR) -I$(SRC_DIR)
 LDFLAGS		:= -lreadline
 
-SRC			:= $(wildcard $(SRC_DIR)/*.c)
+SRC			:= $(wildcard $(SRC_DIR)/*.c) # PAS LE DROIT A WILDCARD
 OBJ			:= $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRC))
-
+ 
 # === Rules ===
 
 all: $(NAME)

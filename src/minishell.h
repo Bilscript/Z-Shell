@@ -36,7 +36,7 @@ typedef struct s_token {
     struct s_token  *next;
 }   t_token;
 
-t_token *tokenizer(char *input);
+t_token	*tokenizer(char *input, char **envp);
 void    print_tokens(t_token *list);
 void    free_tokens(t_token *list);
 void	token_word(char *input, size_t *i, t_token **tokens);

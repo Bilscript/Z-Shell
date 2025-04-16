@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   token_utils2.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
+/*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 12:14:09 by slebik            #+#    #+#             */
-/*   Updated: 2025/04/16 11:10:56 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/04/16 13:08:45 by slebik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,11 +59,11 @@ char	*get_env_variable(char **envp, char *token_value, t_quote_status quote_stat
 		if (!envp || !token_value || token_value[0] != '$')
 			return (perror("invalid token"), NULL);
 		var_name = token_value + 1;
-		len = strlen(var_name); //ft
+		len = ft_strlen(var_name);
 		i = 0;
 		while (envp[i])
 		{
-			if (strncmp(envp[i], var_name, len) == 0 && envp[i][len] == '=') //ft
+			if (ft_strncmp(envp[i], var_name, len) == 0 && envp[i][len] == '=')
 				return (envp[i] + len + 1);
 			i++;
 		}

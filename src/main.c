@@ -24,10 +24,12 @@ void handle_sigint(int sig)
 	rl_redisplay();
 }
 
-int main(void)
+int main(int ac, char **av, char **envp)
 {
 	char *input;
 
+	(void)ac;
+	(void)av;
 	signal(SIGINT, handle_sigint);
 	signal(SIGQUIT, SIG_IGN);
 	while (1)
@@ -44,7 +46,7 @@ int main(void)
 		{
 			
 			add_history(input);
-			t_token *token = tokenizer(input);
+			t_token *token = tokenizer(input, envp);
 			printf("\033[1;32mTokens:\033[0m\n");			
 			print_tokens(token);
 			free_tokens(token);
