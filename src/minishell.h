@@ -29,6 +29,19 @@ typedef enum e_quote_status {
 	QUOTE_DOUBLE
 }	t_quote_status;
 
+typedef struct s_redir {
+    int type;              // REDIR_IN, REDIR_OUT, APPEND, HEREDOC
+    char *filename;
+    struct s_redir *next;
+} t_redir;
+
+typedef struct s_command {
+    char *cmd;             // "echo", "ls", "cat", etc.
+    char **args;           // tableau de tous les arguments (cmd inclus)
+    t_redir *redirs;       // liste de redirections
+    struct s_command *next;// pour les pipes (commande suivante)
+} t_command;
+
 typedef struct s_token {
     t_token_type    type;
     char            *value;
@@ -36,7 +49,8 @@ typedef struct s_token {
     struct s_token  *next;
 }   t_token;
 
-t_token	*tokenizer(char *input, char **envp);
+t_token			*tokenizer(char *input, char **envp);
+t_quote_status	ft_lasttoken_status(t_token *lst);
 void    print_tokens(t_token *list);
 void    free_tokens(t_token *list);
 void	token_word(char *input, size_t *i, t_token **tokens);
@@ -44,9 +58,10 @@ void	add_token(t_token **src, t_token *dest);
 int		ft_isspace(char c);
 int		is_special(char c);
 void 	parse_simple_quote(char *input, size_t *i, t_token **tokens);
-void 	parse_double_quote(char *input, size_t *i, t_token **tokens);
+void parse_double_quote(char *input, size_t *i, t_token **tokens, char **envp);
 t_token *new_token(t_token_type namecode, char* start, size_t len, t_quote_status quote_status);
 char	*get_env_variable(char **envp, char *token_value, t_quote_status quote_status);
+void token_dollar(char *input, size_t *i, t_token **tokens, char **envp, t_quote_status quote_status);
 
 
 #endif

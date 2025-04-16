@@ -12,18 +12,6 @@
 
 #include "minishell.h"
 
-t_token *new_token(t_token_type namecode, char* start, size_t len, t_quote_status quote_status)
-{
-	t_token *new;
-
-	new = malloc(sizeof(t_token));
-	new->type = namecode;
-	new->value = strndup(start, len);
-	new->quote_status = quote_status;
-	new->next = NULL;
-	return (new);
-}
-
 void token_word(char *input, size_t *i, t_token **tokens)
 {
 	size_t	start;
@@ -34,19 +22,21 @@ void token_word(char *input, size_t *i, t_token **tokens)
 	add_token(tokens, new_token(TOKEN_WORD, &input[start], *i - start, QUOTE_NONE));
 }
 
-void token_dollar(char *input, size_t *i, t_token **tokens, char **envp)
+void token_dollar(char *input, size_t *i, t_token **tokens, char **envp, t_quote_status quote_status)
 {
-	size_t start = *i;
+	size_t start;
 	char *tmp;
 	char *value;
+
+	start = *i
 	(*i)++;
 	while (input[*i] && (ft_isalnum(input[*i]) || input[*i] == '_'))
 		(*i)++;
-	tmp = strndup(&input[start], *i - start); // ft  $USER
-	value = get_env_variable(envp, tmp, QUOTE_NONE); // ou je passe un quote_status réel
+	tmp = strndup(&input[start], *i - start);
+	value = get_env_variable(envp, tmp, quote_status);
 	free(tmp);
 	if (value)
-		add_token(tokens, new_token(TOKEN_WORD, value, ft_strlen(value), QUOTE_NONE));
+		add_token(tokens, new_token(TOKEN_WORD, value, ft_strlen(value), quote_status));
 }
 
 void tokenize(char *input, size_t *i, t_token **tokens, char **envp)
@@ -54,7 +44,7 @@ void tokenize(char *input, size_t *i, t_token **tokens, char **envp)
 	if (input[*i] == '|')
 		add_token(tokens, new_token(TOKEN_PIPE, &input[(*i)++], 1, QUOTE_NONE));
 	else if (input[*i] == '$')
-		token_dollar(input, i, tokens, envp);
+		token_dollar(input, i, tokens, envp, QUOTE_NONE);
 	else if (input[*i] == '<')
 	{
 		if (input[*i + 1] == '<')
@@ -70,7 +60,7 @@ void tokenize(char *input, size_t *i, t_token **tokens, char **envp)
 			add_token(tokens, new_token(TOKEN_REDIR_OUT, &input[(*i)++], 1, QUOTE_NONE));
 	}
 	else if (input[*i] == '"')
-		parse_double_quote(input, i ,tokens);
+		parse_double_quote(input, i ,tokens, envp);
 	else if (input[*i] == '\'')
 		parse_simple_quote(input, i ,tokens);
 	else
@@ -93,5 +83,6 @@ t_token *tokenizer(char *input, char **envp)
 		}
 		tokenize(input, &i, &tokens, envp);
 	}
+	add_token(&tokens, new_token(TOKEN_EOF, NULL, 0, QUOTE_NONE));
 	return tokens;
 }
