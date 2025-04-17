@@ -36,7 +36,7 @@ void token_dollar(char *input, size_t *i, t_token **tokens, char **envp, t_quote
 	value = get_env_variable(envp, tmp, quote_status);
 	free(tmp);
 	if (value)
-		add_token(tokens, new_token(TOKEN_WORD, value, ft_strlen(value), quote_status));
+		add_token(tokens, new_token(TOKEN_VAR, value, ft_strlen(value), quote_status));
 }
 
 void tokenize(char *input, size_t *i, t_token **tokens, char **envp)

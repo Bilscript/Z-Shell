@@ -20,7 +20,7 @@ int ft_isspace(char c)
 
 int is_special(char c)
 {
-    return (c == '|' || c == '<' || c == '>' || c == '"' || c == '\'');
+    return (c == '|' || c == '<' || c == '>' || c == '"' || c == '\'' || c == '$');
 }
 
 void print_tokens(t_token *list) 
