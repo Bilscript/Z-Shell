@@ -1,0 +1,3 @@
+-$$ ca met 2 variables not found au lieu de trv la bonne
+-${}
+- cat "" / cat ''/ cat solo te donne acces au stdin alors que les 2 autres donne une erreur donc garder ""
