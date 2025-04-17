@@ -6,7 +6,7 @@
 /*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 12:14:09 by slebik            #+#    #+#             */
-/*   Updated: 2025/04/16 18:20:43 by slebik           ###   ########.fr       */
+/*   Updated: 2025/04/17 18:02:16 by slebik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,18 +17,24 @@ void parse_double_quote(char *input, size_t *i, t_token **tokens, char **envp)
 	size_t start;
 
 	(*i)++;
+	if (input[*i] == '"')
+	{
+		add_token(tokens, new_token(TOKEN_WORD, "", 0, QUOTE_DOUBLE));
+		(*i)++;
+		return ;
+	}
 	while (input[*i] && input[*i] != '"')
 	{
 		start = *i;
 		if (input[*i] == '$')
-		{
 			token_dollar(input, i, tokens, envp, QUOTE_DOUBLE);
-		}
 		else
 		{
-			while (input[*i] && input[*i] != '$' && input[*i] != '"')
-				(*i)++;
+			int tmp = i;
+			while (input[*i] && input[*i] != '"')
+			(*i)++;
 			add_token(tokens, new_token(TOKEN_WORD, &input[start], *i - start, QUOTE_DOUBLE));
+			// check_dollar(token, tmp); si ya un $ dans la string word "asfsa$USER" alors on token dollars mais on garde tt dans un tokken
 		}
 	}
 	if (input[*i] == '"')
@@ -37,23 +43,28 @@ void parse_double_quote(char *input, size_t *i, t_token **tokens, char **envp)
 		printf("\033[0;31mSyntax error: unclosed double quote\033[0m\n");
 }
 
-void parse_simple_quote(char *input, size_t *i, t_token **tokens)
+void	parse_simple_quote(char *input, size_t *i, t_token **tokens)
 {
-	char 	quote;
 	size_t	start;
 
-	quote = input[*i];
+	if (input[*i] == '\'' && input[*i + 1] == '\'')
+	{
+		add_token(tokens, new_token(TOKEN_WORD, "", 0, QUOTE_SINGLE));
+		(*i) += 2;
+		return ;
+	}
 	start = ++(*i);
-	while (input[*i] && input[*i] != quote)
+	while (input[*i] && input[*i] != '\'')
 		(*i)++;
-	if (input[*i] == quote)
+	if (input[*i] == '\'')
 	{
 		add_token(tokens, new_token(TOKEN_WORD, &input[start], *i - start, QUOTE_SINGLE));
 		(*i)++;
 	}
 	else
-		printf("\033[0;31mSyntax error: unclosed quote\033[0m\n");
+		printf("\033[0;31mSyntax error: unclosed single quote\033[0m\n");
 }
+
 
 char *get_env_variable(char **envp, char *token_value, t_quote_status quote_status)
 {
