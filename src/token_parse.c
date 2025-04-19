@@ -3,53 +3,61 @@
 /*                                                        :::      ::::::::   */
 /*   token_parse.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
+/*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/17 16:57:58 by bhamani           #+#    #+#             */
-/*   Updated: 2025/04/17 17:06:44 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/04/19 16:17:18 by slebik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-t_command *parse_tokens(t_token *token)
+void    add_redir_to_cmd(t_command *cmd, t_token *tokens)
 {
-	t_command *cmds = NULL;
-	t_command *current = NULL;
-
-	while (token)
-	{
-		if (!current)
-		{
-			current = calloc(1, sizeof(t_command));
-			if (!cmds)
-				cmds = current;
-		}
-
-		if (token->type == TOKEN_WORD)
-			add_arg(current, token->value);
-		else if (token->type == TOKEN_REDIR_IN || token->type == TOKEN_REDIR_OUT
-				|| token->type == TOKEN_APPEND || token->type == TOKEN_HEREDOC)
-		{
-			token = token->next;
-			if (!token || token->type != TOKEN_WORD)
-			{
-				printf("Erreur de redirection : fichier manquant\n");
-				return NULL;
-			}
-			add_redir(current, token->prev->type, token->value);
-		}
-		else if (token->type == TOKEN_PIPE)
-		{
-			current->next = calloc(1, sizeof(t_command));
-			current = current->next;
-		}
-		token = token->next;
-	}
-	return cmds;
+    if (tokens->next && tokens->next->type == TOKEN_WORD)
+        add_redir(cmd, new_redir(tokens->type, tokens->next->value));
+    else
+        printf("\033[0;31mSyntax error: no redirection file\033[0m\n");
 }
 
-t_command *parse_tokens(t_token *token)
+void    process_token(t_token *tokens, t_command **current)
 {
-	
+    if (tokens->type == TOKEN_WORD)
+        add_arg(*current, tokens->value);
+    else if (tokens->type == TOKEN_REDIR_IN
+        || tokens->type == TOKEN_REDIR_OUT
+        || tokens->type == TOKEN_APPEND
+        || tokens->type == TOKEN_HEREDOC)
+        add_redir_to_cmd(*current, tokens);
+    else if (tokens->type == TOKEN_PIPE)
+    {
+        (*current)->next = new_command();
+        *current = (*current)->next;
+    }
+}
+
+t_command    *lexer(t_token *tokens)
+{
+    t_command    *head;
+    t_command    *current;
+
+    head = NULL;
+    current = NULL;
+    while (tokens)
+    {
+        if (!current)
+        {
+            current = new_command();
+            if (!head)
+                head = current;
+        }
+        process_token(tokens, &current);
+        if (tokens->type == TOKEN_REDIR_IN
+            || tokens->type == TOKEN_REDIR_OUT
+            || tokens->type == TOKEN_APPEND
+            || tokens->type == TOKEN_HEREDOC)
+            tokens = tokens->next;
+        tokens = tokens->next;
+    }
+    return (head);
 }

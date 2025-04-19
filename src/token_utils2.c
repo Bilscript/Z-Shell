@@ -6,7 +6,7 @@
 /*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 12:14:09 by slebik            #+#    #+#             */
-/*   Updated: 2025/04/19 13:14:00 by slebik           ###   ########.fr       */
+/*   Updated: 2025/04/19 13:44:13 by slebik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,11 @@ char	*extract_dollar(char *input, size_t *i, char **envp, t_quote_status status)
 	size_t	start;
 
 	(*i)++;
+	if (input[*i] == '$')
+	{
+	    (*i)++;
+	    return (ft_itoa(getpid()));
+	}
 	start = *i;
 	while (ft_isalnum(input[*i]) || input[*i] == '_')
 		(*i)++;

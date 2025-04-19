@@ -50,19 +50,29 @@ typedef struct s_token {
     struct s_token  *next;
 }   t_token;
 
-t_token			*tokenizer(char *input, char **envp);
-t_quote_status	ft_lasttoken_status(t_token *lst);
-void			print_tokens(t_token *list);
-void			free_tokens(t_token *list);
-void			token_word(char *input, size_t *i, t_token **tokens);
-void			add_token(t_token **src, t_token *dest);
-int				ft_isspace(char c);
-int				is_special(char c);
-void			parse_simple_quote(char *input, size_t *i, t_token **tokens);
-void			parse_double_quote(char *input, size_t *i, t_token **tokens, char **envp);
-t_token 		*new_token(t_token_type namecode, char* start, size_t len, t_quote_status quote_status);
-char			*get_env_variable(char **envp, char *token_value, t_quote_status quote_status);
-void			token_dollar(char *input, size_t *i, t_token **tokens, char **envp, t_quote_status quote_status);
+//================TOKEN UTILS================
+t_token            *tokenizer(char *input, char **envp);
+t_token         *new_token(t_token_type namecode, char* start, size_t len, t_quote_status quote_status);
+t_quote_status    ft_lasttoken_status(t_token *lst);
+void            add_token(t_token **src, t_token *dest);
+void            token_dollar(char *input, size_t *i, t_token **tokens, char **envp, t_quote_status quote_status);
+void            token_word(char *input, size_t *i, t_token **tokens);
+void            free_tokens(t_token *list);
+void            print_tokens(t_token *list);
+
+int                ft_isspace(char c);
+int                is_special(char c);
+void            parse_simple_quote(char *input, size_t *i, t_token **tokens);
+void            parse_double_quote(char *input, size_t *i, t_token **tokens, char **envp);
+char            *get_env_variable(char **envp, char *token_value, t_quote_status quote_status);
+
+//================LEXER UTILS================
+t_command        *lexer(t_token *tokens);
+t_command        *new_command(void); 
+t_redir            *new_redir(int type, const char *filename);
+void            add_arg(t_command *cmd, const char *word);
+void            add_redir(t_command *cmd, t_redir *redir);
+void            print_commands(t_command *cmd_list);
 
 
 #endif

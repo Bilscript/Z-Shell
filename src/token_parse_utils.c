@@ -3,29 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   token_parse_utils.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
+/*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/17 16:18:26 by bhamani           #+#    #+#             */
-/*   Updated: 2025/04/17 17:56:49 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/04/19 16:01:23 by slebik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-void	add_args(t_command *line_cmd, const char *args)
-{
-	int		i;
-	char	**new_args;
-
-	
-	i = 0;
-	if (!line_cmd->cmd)
-	{
-		line_cmd->cmd = new_args[0];
-	}
-	
-	
-}
 
 t_command *new_command(void)
 {
@@ -91,4 +76,84 @@ void add_arg(t_command *cmd, const char *word)
 	cmd->args = new_args;
 	if (cmd->cmd == NULL)
 		cmd->cmd = new_args[0];
+}
+
+void    free_args(char **args)
+{
+    int    i;
+
+    if (args)
+    {
+        i = 0;
+        while (args[i])
+        {
+            free(args[i]);
+            i++;
+        }
+        free(args);
+    }
+}
+
+void    free_redirs(t_redir *redir)
+{
+    t_redir    *tmp_redir;
+
+    while (redir)
+    {
+        tmp_redir = redir;
+        free(redir->filename);
+        redir = redir->next;
+        free(tmp_redir);
+    }
+}
+
+void    free_command(t_command *cmd)
+{
+    t_command    *next;
+
+    while (cmd)
+    {
+        next = cmd->next;
+        free_args(cmd->args);
+        free_redirs(cmd->redirs);
+        free(cmd->cmd);
+        free(cmd);
+        cmd = next;
+    }
+}
+
+void print_commands(t_command *cmd_list)
+{
+    const char *redir_types[] = {
+        "REDIR_IN", "REDIR_OUT", "APPEND", "HEREDOC"
+    };
+
+    while (cmd_list)
+    {
+        printf("=== Command ===\n");
+
+        // Affichage de la commande principale
+        printf("Command: %s\n", cmd_list->cmd ? cmd_list->cmd : "(null)");
+
+        // Affichage des arguments
+        printf("Arguments:\n");
+        if (cmd_list->args)
+        {
+            for (int i = 0; cmd_list->args[i]; i++)
+                printf("  - [%s]\n", cmd_list->args[i]);
+        }
+        else
+            printf("  (none)\n");
+        printf("Redirections:\n");
+        t_redir *redir = cmd_list->redirs;
+        if (!redir)
+            printf("  - (Aucune redirection)\n");
+        while (redir)
+        {
+            printf("  - Type: %s, File: [%s]\n", redir_types[redir->type - TOKEN_REDIR_IN], redir->filename);
+            redir = redir->next;
+        }
+        printf("\n");
+        cmd_list = cmd_list->next;
+    }
 }

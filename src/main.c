@@ -42,14 +42,15 @@ int main(int ac, char **av, char **envp)
 		}
 		if (strcmp(input, "clear") == 0) // ft
             rl_clear_history();
-		if (input[0] != '\0')
-		{
-			add_history(input);
-			t_token *token = tokenizer(input, envp);
-			printf("\033[1;32mTokens:\033[0m\n");			
-			print_tokens(token);
-			free_tokens(token);
-		}
+	    if (input[0] != '\0')
+        {
+            add_history(input);
+            t_token *token = tokenizer(input, envp);
+            //print_tokens(token);
+            t_command *command = lexer(token);
+            print_commands(command);
+            free_tokens(token);
+        }
 		free(input);
 	}
 	return 0;
