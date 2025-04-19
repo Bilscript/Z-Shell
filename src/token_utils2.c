@@ -6,41 +6,82 @@
 /*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 12:14:09 by slebik            #+#    #+#             */
-/*   Updated: 2025/04/17 18:02:16 by slebik           ###   ########.fr       */
+/*   Updated: 2025/04/19 13:14:00 by slebik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void parse_double_quote(char *input, size_t *i, t_token **tokens, char **envp)
+char	*strjoin_and_free(char *s1, char *s2)
 {
-	size_t start;
+	char	*new;
+
+	new = ft_strjoin(s1, s2);
+	free(s1);
+	return (new);
+}
+
+char	*extract_dollar(char *input, size_t *i, char **envp, t_quote_status status)
+{
+	char	*key;
+	char	*value;
+	size_t	start;
 
 	(*i)++;
+	start = *i;
+	while (ft_isalnum(input[*i]) || input[*i] == '_')
+		(*i)++;
+	if (start == *i)
+		return (ft_strdup("$"));
+	key = ft_substr(input, start, *i - start);
+	if (!key)
+		return (NULL);
+	value = get_env_variable(envp, key, status);
+	free(key);
+	if (value)
+		return (ft_strdup(value));
+	return (ft_strdup(""));
+}
+
+void	parse_double_quote(char *input, size_t *i, t_token **tokens, char **envp)
+{
+	char	*joined;
+	char	*tmp;
+	size_t	start;
+
+	(*i)++;
+	joined = ft_strdup("");
+	if (!joined)
+		return ;
 	if (input[*i] == '"')
 	{
 		add_token(tokens, new_token(TOKEN_WORD, "", 0, QUOTE_DOUBLE));
 		(*i)++;
+		free(joined);
 		return ;
 	}
 	while (input[*i] && input[*i] != '"')
 	{
-		start = *i;
 		if (input[*i] == '$')
-			token_dollar(input, i, tokens, envp, QUOTE_DOUBLE);
+			tmp = extract_dollar(input, i, envp, QUOTE_DOUBLE);
 		else
 		{
-			int tmp = i;
-			while (input[*i] && input[*i] != '"')
-			(*i)++;
-			add_token(tokens, new_token(TOKEN_WORD, &input[start], *i - start, QUOTE_DOUBLE));
-			// check_dollar(token, tmp); si ya un $ dans la string word "asfsa$USER" alors on token dollars mais on garde tt dans un tokken
+			start = *i;
+			while (input[*i] && input[*i] != '"' && input[*i] != '$')
+				(*i)++;
+			tmp = ft_substr(input, start, *i - start);
 		}
+		if (!tmp)
+			return ;
+		joined = strjoin_and_free(joined, tmp);
+		free(tmp);
 	}
 	if (input[*i] == '"')
 		(*i)++;
 	else
 		printf("\033[0;31mSyntax error: unclosed double quote\033[0m\n");
+	add_token(tokens, new_token(TOKEN_WORD, joined, ft_strlen(joined), QUOTE_DOUBLE));
+	free(joined);
 }
 
 void	parse_simple_quote(char *input, size_t *i, t_token **tokens)
@@ -66,25 +107,22 @@ void	parse_simple_quote(char *input, size_t *i, t_token **tokens)
 }
 
 
-char *get_env_variable(char **envp, char *token_value, t_quote_status quote_status)
+char	*get_env_variable(char **envp, char *key, t_quote_status status)
 {
 	int		i;
-	char	*var_name;
 	size_t	len;
 
-	if (quote_status == QUOTE_SINGLE)
-		return (token_value);
-	if (!envp || !token_value || token_value[0] != '$')
-		return (perror("invalid token"), NULL);
-	var_name = token_value + 1; // pour le skip
-	len = ft_strlen(var_name);
+	if (status == QUOTE_SINGLE)
+		return (NULL);
+	if (!envp || !key)
+		return (NULL);
+	len = ft_strlen(key);
 	i = 0;
 	while (envp[i])
 	{
-		if (ft_strncmp(envp[i], var_name, len) == 0 && envp[i][len] == '=')
-			return (envp[i] + len + 1); // return la valeur apres le = 
+		if (ft_strncmp(envp[i], key, len) == 0 && envp[i][len] == '=')
+			return (envp[i] + len + 1);
 		i++;
 	}
-	perror("\033[0;31mvariable not found\033[0m\n");
 	return (NULL);
 }

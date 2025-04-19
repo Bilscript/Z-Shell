@@ -32,12 +32,12 @@ void token_dollar(char *input, size_t *i, t_token **tokens, char **envp, t_quote
 	(*i)++;
 	while (input[*i] && (ft_isalnum(input[*i]) || input[*i] == '_'))
 		(*i)++;
-	tmp = strndup(&input[start], *i - start);
+	tmp = strndup(&input[start + 1], *i - start - 1); //ft
 	value = get_env_variable(envp, tmp, quote_status);
 	free(tmp);
 	if (value)
 		add_token(tokens, new_token(TOKEN_VAR, value, ft_strlen(value), quote_status));
-} 
+}
 
 void tokenize(char *input, size_t *i, t_token **tokens, char **envp)
 {
