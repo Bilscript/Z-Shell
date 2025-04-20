@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   token_parse_utils.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
+/*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/17 16:18:26 by bhamani           #+#    #+#             */
-/*   Updated: 2025/04/19 16:01:23 by slebik           ###   ########.fr       */
+/*   Updated: 2025/04/20 19:25:17 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,109 +51,123 @@ void add_redir(t_command *cmd, t_redir *redir)
 	}
 }
 
-void add_arg(t_command *cmd, const char *word)
+static char	**copy_args(char **args, int count)
 {
-	int i;
-	int j;
-	char **new_args;
+	char	**new_args;
+	int		i;
+
+	new_args = malloc(sizeof(char *) * (count + 2));
+	if (!new_args)
+		return (NULL);
+	i = 0;
+	while (i < count)
+	{
+		new_args[i] = args[i];
+		i++;
+	}
+	new_args[i] = NULL;
+	new_args[i + 1] = NULL;
+	return (new_args);
+}
+
+void	add_arg(t_command *cmd, const char *word)
+{
+	char	**new_args;
+	int		i;
 
 	i = 0;
 	if (cmd->args)
 		while (cmd->args[i])
 			i++;
-	new_args = malloc(sizeof(char *) * (i + 2));
+	new_args = copy_args(cmd->args, i);
 	if (!new_args)
-		return;
-	j = 0;
-	while (j < i)
-	{
-		new_args[j] = cmd->args[j];
-		j++;
-	}
+		return ;
 	new_args[i] = strdup(word);
 	new_args[i + 1] = NULL;
 	free(cmd->args);
 	cmd->args = new_args;
-	if (cmd->cmd == NULL)
-		cmd->cmd = new_args[0];
+	if (!cmd->cmd)
+		cmd->cmd = cmd->args[0];
 }
 
-void    free_args(char **args)
-{
-    int    i;
 
-    if (args)
-    {
-        i = 0;
-        while (args[i])
-        {
-            free(args[i]);
-            i++;
-        }
-        free(args);
-    }
+void	free_args(char **args)
+{
+	int	i;
+
+	if (!args)
+		return ;
+	i = 0;
+	while (args[i])
+	{
+		free(args[i]);
+		args[i] = NULL;
+		i++;
+	}
+	free(args);
+	args = NULL;
 }
 
-void    free_redirs(t_redir *redir)
+void	free_redirs(t_redir *redir)
 {
-    t_redir    *tmp_redir;
+	t_redir	*tmp_redir;
 
-    while (redir)
-    {
-        tmp_redir = redir;
-        free(redir->filename);
-        redir = redir->next;
-        free(tmp_redir);
-    }
+	while (redir)
+	{
+		tmp_redir = redir;
+		if (redir->filename)
+		{
+			free(redir->filename);
+			redir->filename = NULL;
+		}
+		redir = redir->next;
+		free(tmp_redir);
+		tmp_redir = NULL;
+	}
 }
 
-void    free_command(t_command *cmd)
+void	free_command(t_command *cmd)
 {
-    t_command    *next;
+	t_command	*next;
 
-    while (cmd)
-    {
-        next = cmd->next;
-        free_args(cmd->args);
-        free_redirs(cmd->redirs);
-        free(cmd->cmd);
-        free(cmd);
-        cmd = next;
-    }
+	while (cmd)
+	{
+		next = cmd->next;
+		free_args(cmd->args);
+		free_redirs(cmd->redirs);
+		free(cmd);
+		cmd = next;
+	}
 }
 
 void print_commands(t_command *cmd_list)
 {
-    const char *redir_types[] = {
-        "REDIR_IN", "REDIR_OUT", "APPEND", "HEREDOC"
-    };
+	const char *redir_types[] = {
+		"REDIR_IN", "REDIR_OUT", "APPEND", "HEREDOC"
+	};
 
-    while (cmd_list)
-    {
-        printf("=== Command ===\n");
-
-        // Affichage de la commande principale
-        printf("Command: %s\n", cmd_list->cmd ? cmd_list->cmd : "(null)");
-
-        // Affichage des arguments
-        printf("Arguments:\n");
-        if (cmd_list->args)
-        {
-            for (int i = 0; cmd_list->args[i]; i++)
-                printf("  - [%s]\n", cmd_list->args[i]);
-        }
-        else
-            printf("  (none)\n");
-        printf("Redirections:\n");
-        t_redir *redir = cmd_list->redirs;
-        if (!redir)
-            printf("  - (Aucune redirection)\n");
-        while (redir)
-        {
-            printf("  - Type: %s, File: [%s]\n", redir_types[redir->type - TOKEN_REDIR_IN], redir->filename);
-            redir = redir->next;
-        }
-        printf("\n");
-        cmd_list = cmd_list->next;
-    }
+	while (cmd_list)
+	{
+		printf("=== Command ===\n");
+		printf("Command: %s\n", cmd_list->cmd ? cmd_list->cmd : "(null)");
+		printf("Arguments:\n");
+		if (cmd_list->args)
+		{
+			for (int i = 0; cmd_list->args[i]; i++)
+				printf("  - [%s]\n", cmd_list->args[i]);
+		}
+		else
+			printf("  (none)\n");
+		printf("Redirections:\n");
+		t_redir *redir = cmd_list->redirs;
+		if (!redir)
+			printf("  - (Aucune redirection)\n");
+		while (redir)
+		{
+			printf("  - Type: %s, File: [%s]\n", redir_types[redir->type - TOKEN_REDIR_IN], redir->filename);
+			redir = redir->next;
+		}
+		printf("\n");
+		cmd_list = cmd_list->next;
+	}
 }

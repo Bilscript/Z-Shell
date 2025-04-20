@@ -24,6 +24,7 @@ typedef struct s_list
 	struct s_list		*next;
 }					t_list;
 
+int			ft_strcmp(const char *s1, const char *s2);
 size_t		ft_strlen(const char *str);
 char		*ft_strchr(const char *str, int c);
 char		*ft_strdup(const char *s);

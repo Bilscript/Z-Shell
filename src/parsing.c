@@ -24,60 +24,60 @@ void token_word(char *input, size_t *i, t_token **tokens)
 
 void get_pid_var(char **value, size_t *i, t_token **tokens, t_quote_status quote_status)
 {
-    (*i)++;
-    *value = ft_itoa(getpid());
-    add_token(tokens, new_token(TOKEN_WORD, *value, ft_strlen(*value), quote_status));
-    free(*value);
+	(*i)++;
+	*value = ft_itoa(getpid());
+	add_token(tokens, new_token(TOKEN_WORD, *value, ft_strlen(*value), quote_status));
+	free(*value);
 }
 
 void accolade_gestion(char *input, size_t *i, char **tmp)
 {
-    size_t start;
+	size_t start;
 
-    (*i)++;
-    start = *i;
-    while (input[*i] && input[*i] != '}')
-        (*i)++;
-    if (input[*i] == '}')
-    {
-        *tmp = ft_substr(input, start, *i - start);
-        (*i)++;
-    }
-    else
-    {
-        *tmp = NULL;
-        printf("\033[0;31mSyntax error: unclosed ${}\033[0m\n");
-    }
+	(*i)++;
+	start = *i;
+	while (input[*i] && input[*i] != '}')
+		(*i)++;
+	if (input[*i] == '}')
+	{
+		*tmp = ft_substr(input, start, *i - start);
+		(*i)++;
+	}
+	else
+	{
+		*tmp = NULL;
+		printf("\033[0;31mSyntax error: unclosed ${}\033[0m\n");
+	}
 }
 
 void token_dollar(char *input, size_t *i, t_token **tokens, char **envp, t_quote_status quote_status)
 {
-    size_t start;
-    char *tmp;
-    char *value;
+	size_t start;
+	char *tmp;
+	char *value;
 
-    start = *i;
-    (*i)++;
-    if (input[*i] == '$')
-    {
-        get_pid_var(&value, i, tokens, quote_status);
-        return;
-    }
-    if (input[*i] == '{')
-        accolade_gestion(input, i, &tmp);
-    else
-    {
-        while (input[*i] && (ft_isalnum(input[*i]) || input[*i] == '_'))
-            (*i)++;
-        tmp = strndup(&input[start + 1], *i - start - 1);  // Extraire le nom de la variable
-    }
-    if (tmp)
-    {
-        value = get_env_variable(envp, tmp, quote_status);
-        free(tmp);
-        if (value)
-            add_token(tokens, new_token(TOKEN_WORD, value, ft_strlen(value), quote_status));
-    }
+	start = *i;
+	(*i)++;
+	if (input[*i] == '$')
+	{
+		get_pid_var(&value, i, tokens, quote_status);
+		return;
+	}
+	if (input[*i] == '{')
+		accolade_gestion(input, i, &tmp);
+	else
+	{
+		while (input[*i] && (ft_isalnum(input[*i]) || input[*i] == '_'))
+			(*i)++;
+		tmp = strndup(&input[start + 1], *i - start - 1);  // Extraire le nom de la variable
+	}
+	if (tmp)
+	{
+		value = get_env_variable(envp, tmp, quote_status);
+		free(tmp);
+		if (value)
+			add_token(tokens, new_token(TOKEN_WORD, value, ft_strlen(value), quote_status));
+	}
 }
 
 void tokenize(char *input, size_t *i, t_token **tokens, char **envp)

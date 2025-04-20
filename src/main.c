@@ -38,20 +38,21 @@ int main(int ac, char **av, char **envp)
 		if (!input)
 		{
 			printf("exit\n");
-			break;
+			break ;
 		}
-		if (strcmp(input, "clear") == 0) // ft
-            rl_clear_history();
-	    if (input[0] != '\0')
-        {
-            add_history(input);
-            t_token *token = tokenizer(input, envp);
-            //print_tokens(token);
-            t_command *command = lexer(token);
-            print_commands(command);
-            free_tokens(token);
-        }
+		if (input[0] != '\0')
+		{
+			add_history(input);
+			t_token *token = tokenizer(input, envp);
+			print_tokens(token);
+			t_command *command = lexer(token);
+			//print_commands(command);
+			exec(command, envp);
+			free_tokens(token);
+			free_command(command);
+		}
 		free(input);
 	}
+	rl_clear_history();
 	return 0;
 }

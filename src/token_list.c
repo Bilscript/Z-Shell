@@ -12,9 +12,9 @@
 
 #include "minishell.h"
 
-void add_token(t_token **src, t_token *dest)
+void	add_token(t_token **src, t_token *dest)
 {
-	t_token *tmp;
+	t_token	*tmp;
 
 	if (!*src)
 		*src = dest;
@@ -27,26 +27,26 @@ void add_token(t_token **src, t_token *dest)
 	}
 }
 
-void free_tokens(t_token *list)
+void	free_tokens(t_token *list)
 {
-    t_token *tmp;
+	t_token	*tmp;
 
-    while (list) 
+	while (list)
 	{
-        tmp = list->next;
-        free(list->value);
-        free(list);
-        list = tmp;
-    }
+		tmp = list->next;
+		free(list->value);
+		free(list);
+		list = tmp;
+	}
 }
 
 t_token *new_token(t_token_type namecode, char* start, size_t len, t_quote_status quote_status)
 {
-	t_token *new;
+	t_token	*new;
 
 	new = malloc(sizeof(t_token));
 	new->type = namecode;
-	new->value = strndup(start, len); //ft 
+	new->value = strndup(start, len); //ft
 	new->quote_status = quote_status;
 	new->next = NULL;
 	return (new);
@@ -54,13 +54,12 @@ t_token *new_token(t_token_type namecode, char* start, size_t len, t_quote_statu
 
 t_quote_status	ft_lasttoken_status(t_token *lst)
 {
-    t_token *temp;
+	t_token	*temp;
 
-    if (lst == NULL)
-        return (QUOTE_NONE);
-    temp = lst;
-    while (temp->next != NULL)
-        temp = temp->next;
-    return (temp->quote_status);
+	if (lst == NULL)
+		return (QUOTE_NONE);
+	temp = lst;
+	while (temp->next != NULL)
+		temp = temp->next;
+	return (temp->quote_status);
 }
- 
