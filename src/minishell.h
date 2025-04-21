@@ -52,6 +52,7 @@ typedef struct s_envp
 {
 	char			*key;
 	char			*value;
+	bool			export;
 	struct s_envp	*next;
 }	t_envp;
 
@@ -78,6 +79,7 @@ int				is_special(char c);
 void			parse_simple_quote(char *input, size_t *i, t_token **tokens);
 void			parse_double_quote(char *input, size_t *i, t_token **tokens, char **envp);
 char			*get_env_variable(char **envp, char *token_value, t_quote_status status);
+char			*ft_strndup(const char *s, size_t n);
 
 //================LEXER UTILS================
 t_command		*lexer(t_token *tokens);
@@ -88,11 +90,17 @@ void			add_redir(t_command *cmd, t_redir *redir);
 void			print_commands(t_command *cmd_list);
 void			free_command(t_command *cmd);
 
-//================LEXER UTILS================
-void			exec(t_command *cmd_line, char **envp);
+//================BUILT-IN UTILS================
+void			exec(t_command *cmd_line, t_envp* envp);
 void			ft_echo(t_command *cmd);
 void		    ft_pwd(void);
 void			ft_cd(t_command *cmd_line);
-void			ft_env(t_command *cmd, char **envp);
+void			ft_export(t_command *cmd, t_envp *envp);
+t_envp			*new_envp(const char *key, const char *value, bool exprt);
+t_envp			*get_env(char **env);
+void			ft_env(t_command *cmd, t_envp *envp);
+int				len_until_char(const char *str, char c);
+void			add_envp_back(t_envp **head, t_envp *new_node);
+t_envp			*new_envp(const char *key, const char *value, bool exprt);
 
 #endif

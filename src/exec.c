@@ -6,13 +6,13 @@
 /*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 13:38:30 by bhamani           #+#    #+#             */
-/*   Updated: 2025/04/20 20:41:06 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/04/21 18:43:57 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static void	exec_builtin(t_command *cmd, char **envp)
+static void	exec_builtin(t_command *cmd, t_envp *envp)
 {
 	if (ft_strcmp(cmd->cmd, "echo") == 0)
 		ft_echo(cmd);
@@ -20,8 +20,8 @@ static void	exec_builtin(t_command *cmd, char **envp)
 		ft_cd(cmd);
 	else if (ft_strcmp(cmd->cmd, "pwd") == 0)
 		ft_pwd();
-	//else if (ft_strcmp(cmd->cmd, "export") == 0)
-	//	ft_export(cmd);
+	else if (ft_strcmp(cmd->cmd, "export") == 0)
+		ft_export(cmd, envp);
 	//else if (ft_strcmp(cmd->cmd, "unset") == 0)
 	//	ft_unset(cmd);
 	else if (ft_strcmp(cmd->cmd, "env") == 0)
@@ -36,7 +36,7 @@ static void	exec_builtin(t_command *cmd, char **envp)
 	}
 }
 
-void	exec(t_command *cmd_line, char **envp)
+void	exec(t_command *cmd_line, t_envp *envp)
 {
 	while (cmd_line)
 	{

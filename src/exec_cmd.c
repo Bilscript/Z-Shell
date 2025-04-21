@@ -6,7 +6,7 @@
 /*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 14:12:19 by bhamani           #+#    #+#             */
-/*   Updated: 2025/04/21 16:24:04 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/04/21 19:07:21 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,20 +90,37 @@ void	ft_echo(t_command *cmd)
 		printf("\n");
 }
 
-void	ft_env(t_command *cmd, char **envp)
+void	ft_env(t_command *cmd, t_envp *envp)
 {
-	int	i;
-
-	i = 0;
 	if (cmd->args[1])
 	{
 		printf("cd: too many arguments\n");
 		return ;
 	}
-	while (envp[i])
+	while (envp)
 	{
-		printf("%s\n", envp[i]);
-		i++;
+		printf("%s=%s\n", envp->key, envp->value);
+		envp = envp->next;
 	}
 }
 
+void	ft_export(t_command *cmd, t_envp *envp)
+{
+	t_envp	*temp;
+	int		len;
+
+	temp = envp;
+	if (!cmd->args[1])
+	{
+		while (temp)
+		{
+			if (temp->export == true)
+				printf("export %s=%s\n", temp->key, temp->value);
+			temp = temp->next;
+		}
+		return ;
+	}
+	len = len_until_char(cmd->args[1], '=');
+	add_envp_back(&envp, new_envp(ft_strndup(cmd->args[1],
+				len), cmd->args[1] + len + 1, true));
+}
