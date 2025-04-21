@@ -25,7 +25,8 @@ typedef enum e_token_type
 	TOKEN_EOF
 }	t_token_type;
 
-typedef enum e_quote_status {
+typedef enum e_quote_status
+{
 	QUOTE_NONE,
 	QUOTE_SINGLE,
 	QUOTE_DOUBLE
@@ -33,19 +34,26 @@ typedef enum e_quote_status {
 
 typedef struct s_redir
 {
-	int				type;			// REDIR_IN, REDIR_OUT, APPEND, HEREDOC
+	int				type;
 	char			*filename;
 	struct s_redir	*next;
 }	t_redir;
 
 typedef struct s_command
 {
-	char				*cmd;			// "echo", "ls", "cat", etc.
-	char				**args;			// tableau de tous les arguments (cmd inclus)
-	t_redir				*redirs;		// liste de redirections
-	int					append;			// 0 = truncate 1 = append
-	struct s_command	*next;			// pour les pipes (commande suivante)
+	char				*cmd;
+	char				**args;
+	t_redir				*redirs;
+	int					append;
+	struct s_command	*next;
 }	t_command;
+
+typedef struct s_envp
+{
+	char			*key;
+	char			*value;
+	struct s_envp	*next;
+}	t_envp;
 
 typedef struct s_token
 {
@@ -57,10 +65,10 @@ typedef struct s_token
 
 //================TOKEN UTILS================
 t_token			*tokenizer(char *input, char **envp);
-t_token			*new_token(t_token_type namecode, char* start, size_t len, t_quote_status quote_status);
+t_token			*new_token(t_token_type namecode, char* start, size_t len, t_quote_status status);
 t_quote_status	ft_lasttoken_status(t_token *lst);
 void			add_token(t_token **src, t_token *dest);
-void			token_dollar(char *input, size_t *i, t_token **tokens, char **envp, t_quote_status quote_status);
+void			token_dollar(char *input, size_t *i, t_token **tokens, char **envp, t_quote_status status);
 void			token_word(char *input, size_t *i, t_token **tokens);
 void			free_tokens(t_token *list);
 void			print_tokens(t_token *list);
@@ -69,7 +77,7 @@ int				ft_isspace(char c);
 int				is_special(char c);
 void			parse_simple_quote(char *input, size_t *i, t_token **tokens);
 void			parse_double_quote(char *input, size_t *i, t_token **tokens, char **envp);
-char			*get_env_variable(char **envp, char *token_value, t_quote_status quote_status);
+char			*get_env_variable(char **envp, char *token_value, t_quote_status status);
 
 //================LEXER UTILS================
 t_command		*lexer(t_token *tokens);
