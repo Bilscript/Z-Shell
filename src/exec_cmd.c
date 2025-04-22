@@ -6,7 +6,7 @@
 /*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 14:12:19 by bhamani           #+#    #+#             */
-/*   Updated: 2025/04/21 19:07:21 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/04/22 15:52:38 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,6 +104,21 @@ void	ft_env(t_command *cmd, t_envp *envp)
 	}
 }
 
+int	set_key(t_envp *envp, char *key, char *value)
+{
+	while (envp)
+	{
+		if (ft_strcmp(envp->key, key) == 0)
+		{
+			free(envp->value);
+			envp->value = ft_strdup(value + len_until_char(value, '=') + 1);
+			return (1);
+		}
+		envp = envp->next;
+	}
+	return(0);
+}
+
 void	ft_export(t_command *cmd, t_envp *envp)
 {
 	t_envp	*temp;
@@ -121,6 +136,8 @@ void	ft_export(t_command *cmd, t_envp *envp)
 		return ;
 	}
 	len = len_until_char(cmd->args[1], '=');
+	if (set_key(envp , ft_strndup(cmd->args[1], len), cmd->args[1]))
+		return ;
 	add_envp_back(&envp, new_envp(ft_strndup(cmd->args[1],
 				len), cmd->args[1] + len + 1, true));
 }
