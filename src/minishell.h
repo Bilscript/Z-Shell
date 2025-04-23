@@ -66,19 +66,24 @@ typedef struct s_token
 
 //================TOKEN UTILS================
 t_token			*tokenizer(char *input, char **envp);
-t_token			*new_token(t_token_type namecode, char* start, size_t len, t_quote_status status);
+t_token			*new_token(t_token_type namecode, char *start,
+					size_t len, t_quote_status status);
 t_quote_status	ft_lasttoken_status(t_token *lst);
 void			add_token(t_token **src, t_token *dest);
-void			token_dollar(char *input, size_t *i, t_token **tokens, char **envp, t_quote_status status);
+
+void			token_dollar(char *input, size_t *i, t_token **tokens,
+					char **envp, t_quote_status qs);
+
 void			token_word(char *input, size_t *i, t_token **tokens);
 void			free_tokens(t_token *list);
 void			print_tokens(t_token *list);
-
 int				ft_isspace(char c);
 int				is_special(char c);
 void			parse_simple_quote(char *input, size_t *i, t_token **tokens);
-void			parse_double_quote(char *input, size_t *i, t_token **tokens, char **envp);
-char			*get_env_variable(char **envp, char *token_value, t_quote_status status);
+void			parse_double_quote(char *input, size_t *i,
+					t_token **tokens, char **envp);
+char			*get_env_variable(char **envp,
+					char *token_value, t_quote_status status);
 char			*ft_strndup(const char *s, size_t n);
 
 //================LEXER UTILS================
@@ -91,9 +96,9 @@ void			print_commands(t_command *cmd_list);
 void			free_command(t_command *cmd);
 
 //================BUILT-IN UTILS================
-void			exec(t_command *cmd_line, t_envp* envp);
+void			exec(t_command *cmd_line, t_envp *envp);
 void			ft_echo(t_command *cmd);
-void		    ft_pwd(void);
+void			ft_pwd(void);
 void			ft_cd(t_command *cmd_line);
 void			ft_export(t_command *cmd, t_envp *envp);
 t_envp			*new_envp(const char *key, const char *value, bool exprt);

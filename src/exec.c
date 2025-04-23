@@ -6,7 +6,7 @@
 /*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 13:38:30 by bhamani           #+#    #+#             */
-/*   Updated: 2025/04/21 18:43:57 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/04/23 12:45:53 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,6 @@ static void	exec_builtin(t_command *cmd, t_envp *envp)
 	{
 		printf("(%s): Command not found\n", cmd->cmd);
 		// free tard plus
-		getenv("");
 	}
 }
 

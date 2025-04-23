@@ -12,18 +12,19 @@
 
 #include "minishell.h"
 
-int ft_isspace(char c)
+int	ft_isspace(char c)
 {
 	return (c == ' ' || c == '\t' || c == '\n'
 		|| c == '\v' || c == '\f' || c == '\r');
 }
 
-int is_special(char c)
+int	is_special(char c)
 {
-    return (c == '|' || c == '<' || c == '>' || c == '"' || c == '\'' || c == '$');
+	return (c == '|' || c == '<' || c == '>'
+		|| c == '"' || c == '\'' || c == '$');
 }
 
-void print_tokens(t_token *list) 
+void print_tokens(t_token *list)
 {
 	const char *g_token_names[] =
 	{

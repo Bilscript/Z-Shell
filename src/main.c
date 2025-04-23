@@ -72,7 +72,7 @@ int main(int ac, char **av, char **envp)
 			t_token *token = tokenizer(input, envp);
 			print_tokens(token);
 			t_command *command = lexer(token);
-			//print_commands(command);
+			print_commands(command);
 			exec(command, env);
 			free_tokens(token);
 			free_command(command);

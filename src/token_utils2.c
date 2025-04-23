@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   token_utils2.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
+/*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 12:14:09 by slebik            #+#    #+#             */
-/*   Updated: 2025/04/19 13:44:13 by slebik           ###   ########.fr       */
+/*   Updated: 2025/04/23 13:26:41 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ char	*strjoin_and_free(char *s1, char *s2)
 	return (new);
 }
 
-char	*extract_dollar(char *input, size_t *i, char **envp, t_quote_status status)
+char	*extract_dollar(char *input, size_t *i, char **envp, t_quote_status sta)
 {
 	char	*key;
 	char	*value;
@@ -30,8 +30,8 @@ char	*extract_dollar(char *input, size_t *i, char **envp, t_quote_status status)
 	(*i)++;
 	if (input[*i] == '$')
 	{
-	    (*i)++;
-	    return (ft_itoa(getpid()));
+		(*i)++;
+		return (ft_itoa(getpid()));
 	}
 	start = *i;
 	while (ft_isalnum(input[*i]) || input[*i] == '_')
@@ -41,14 +41,14 @@ char	*extract_dollar(char *input, size_t *i, char **envp, t_quote_status status)
 	key = ft_substr(input, start, *i - start);
 	if (!key)
 		return (NULL);
-	value = get_env_variable(envp, key, status);
+	value = get_env_variable(envp, key, sta);
 	free(key);
 	if (value)
 		return (ft_strdup(value));
 	return (ft_strdup(""));
 }
 
-void	parse_double_quote(char *input, size_t *i, t_token **tokens, char **envp)
+void	parse_double_quote(char *input, size_t *i, t_token **tkn, char **envp)
 {
 	char	*joined;
 	char	*tmp;
@@ -60,7 +60,7 @@ void	parse_double_quote(char *input, size_t *i, t_token **tokens, char **envp)
 		return ;
 	if (input[*i] == '"')
 	{
-		add_token(tokens, new_token(TOKEN_WORD, "", 0, QUOTE_DOUBLE));
+		add_token(tkn, new_token(TOKEN_WORD, "", 0, QUOTE_DOUBLE));
 		(*i)++;
 		free(joined);
 		return ;
@@ -85,7 +85,7 @@ void	parse_double_quote(char *input, size_t *i, t_token **tokens, char **envp)
 		(*i)++;
 	else
 		printf("\033[0;31mSyntax error: unclosed double quote\033[0m\n");
-	add_token(tokens, new_token(TOKEN_WORD, joined, ft_strlen(joined), QUOTE_DOUBLE));
+	add_token(tkn, new_token(TOKEN_WORD, joined, ft_strlen(joined), QUOTE_DOUBLE));
 	free(joined);
 }
 

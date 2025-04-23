@@ -40,17 +40,28 @@ void	free_tokens(t_token *list)
 	}
 }
 
-t_token *new_token(t_token_type namecode, char* start, size_t len, t_quote_status quote_status)
-{
-	t_token	*new;
+t_token *new_token(t_token_type type,
+	char *start,
+	size_t len,
+	t_quote_status q_s)
 
-	new = malloc(sizeof(t_token));
-	new->type = namecode;
-	new->value = strndup(start, len); //ft
-	new->quote_status = quote_status;
-	new->next = NULL;
-	return (new);
+{
+	t_token *tok;
+
+	tok = malloc(sizeof(*tok));
+	if (!tok)
+		return (NULL);
+	tok->type = type;
+	if (start && len > 0)
+		tok->value = ft_strndup(start, len);
+	else
+		tok->value = ft_strdup("");
+	tok->quote_status = q_s;
+	tok->next = NULL;
+	return (tok);
 }
+
+
 
 t_quote_status	ft_lasttoken_status(t_token *lst)
 {

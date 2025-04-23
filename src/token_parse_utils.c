@@ -6,15 +6,17 @@
 /*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/17 16:18:26 by bhamani           #+#    #+#             */
-/*   Updated: 2025/04/20 19:25:17 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/04/23 13:22:32 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-t_command *new_command(void)
+t_command	*new_command(void)
 {
-	t_command *cmd = malloc(sizeof(t_command));
+	t_command	*cmd;
+
+	cmd = malloc(sizeof(t_command));
 	if (!cmd)
 		return NULL;
 	cmd->cmd = NULL;
@@ -22,23 +24,25 @@ t_command *new_command(void)
 	cmd->redirs = NULL;
 	cmd->append = 0;
 	cmd->next = NULL;
-	return cmd;
+	return (cmd);
 }
 
-t_redir *new_redir(int type, const char *filename)
+t_redir	*new_redir(int type, const char *filename)
 {
-	t_redir *redir = malloc(sizeof(t_redir));
+	t_redir	*redir;
+
+	redir = malloc(sizeof(t_redir));
 	if (!redir)
-		return NULL;
+		return (NULL);
 	redir->type = type;
 	redir->filename = strdup(filename);
 	redir->next = NULL;
-	return redir;
+	return (redir);
 }
 
-void add_redir(t_command *cmd, t_redir *redir)
+void	add_redir(t_command *cmd, t_redir *redir)
 {
-	t_redir *tmp;
+	t_redir	*tmp;
 
 	if (!cmd->redirs)
 		cmd->redirs = redir;
