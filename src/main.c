@@ -69,7 +69,7 @@ int main(int ac, char **av, char **envp)
 		if (input[0] != '\0')
 		{
 			add_history(input);
-			parse_and_execute(input, envp, env);
+			parse_and_execute(input, env);
 		}
 		free(input);
 	}

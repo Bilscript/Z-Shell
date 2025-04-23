@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   token_utils2.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
+/*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 12:14:09 by slebik            #+#    #+#             */
-/*   Updated: 2025/04/23 13:26:41 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/04/23 17:10:04 by slebik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ char	*strjoin_and_free(char *s1, char *s2)
 	return (new);
 }
 
-char	*extract_dollar(char *input, size_t *i, char **envp, t_quote_status sta)
+char	*extract_dollar(char *input, size_t *i, t_envp *envp, t_quote_status sta)
 {
 	char	*key;
 	char	*value;
@@ -48,7 +48,7 @@ char	*extract_dollar(char *input, size_t *i, char **envp, t_quote_status sta)
 	return (ft_strdup(""));
 }
 
-void	parse_double_quote(char *input, size_t *i, t_token **tkn, char **envp)
+void	parse_double_quote(char *input, size_t *i, t_token **tkn, t_envp *envp)
 {
 	char	*joined;
 	char	*tmp;
@@ -112,11 +112,13 @@ void	parse_simple_quote(char *input, size_t *i, t_token **tokens)
 }
 
 
-char	*get_env_variable(char **envp, char *key, t_quote_status status)
+char	*get_env_variable(t_envp *env, char *key, t_quote_status status)
 {
 	int		i;
 	size_t	len;
+	char **envp;
 
+	envp = env_list_to_array(env);
 	if (status == QUOTE_SINGLE)
 		return (NULL);
 	if (!envp || !key)

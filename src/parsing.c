@@ -82,7 +82,7 @@ void	accolade_gestion(char *input, size_t *i, char **tmp)
 	}
 }
 
-void	token_dollar(char *input, size_t *i, t_token **tkn, char **envp, t_quote_status sta) // mettre la copie de l'env
+void	token_dollar(char *input, size_t *i, t_token **tkn, t_envp *envp, t_quote_status sta)
 {
 	size_t	start;
 	char	*tmp;
@@ -153,7 +153,7 @@ void	tokenize_special(char *input, size_t *i, t_token **tokens)
 		handle_redir_out(input, i, tokens);
 }
 
-t_token	*tokenizer(char *input, char **envp)
+t_token	*tokenizer(char *input, t_envp *envp)
 {
 	size_t	i;
 	t_token	*tokens;

@@ -6,7 +6,7 @@
 /*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 17:49:19 by slebik            #+#    #+#             */
-/*   Updated: 2025/04/23 15:25:30 by slebik           ###   ########.fr       */
+/*   Updated: 2025/04/23 17:04:17 by slebik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,6 +121,7 @@ void	run_command(t_command *cmd, t_envp *env_list)
 	if (pid < 0)
 	{
 		perror("fork failed");
+		printf("free path\n");
 		free(path);
 		ft_free_split(envp_array);
 		return;
@@ -134,7 +135,7 @@ void	run_command(t_command *cmd, t_envp *env_list)
 	else
 	{
 		waitpid(pid, &status, 0);
-		free(path);
+		// free(path); celui a causer le double free
 		ft_free_split(envp_array);
 	}
 }
@@ -311,12 +312,12 @@ char **env_list_to_array(t_envp *env)
     return (array);
 }
 
-void	parse_and_execute(char *input, char **env_origin, t_envp *env)
+void	parse_and_execute(char *input, t_envp *env)
 {
 	t_token		*token;
 	t_command	*command;
 
-	token = tokenizer(input, env_origin);
+	token = tokenizer(input, env);
 	print_tokens(token); //debug
 	command = lexer(token);
 	print_commands(command); ///debug
