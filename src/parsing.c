@@ -82,7 +82,7 @@ void	accolade_gestion(char *input, size_t *i, char **tmp)
 	}
 }
 
-void	token_dollar(char *input, size_t *i, t_token **tkn, char **envp, t_quote_status sta)
+void	token_dollar(char *input, size_t *i, t_token **tkn, char **envp, t_quote_status sta) // mettre la copie de l'env
 {
 	size_t	start;
 	char	*tmp;

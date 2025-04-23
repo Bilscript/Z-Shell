@@ -10,6 +10,10 @@
 # include "../libft/libft.h"
 # include "linux/limits.h"
 # include <stdbool.h>
+# include <string.h>
+# include <fcntl.h>
+# include <sys/types.h>
+# include <sys/wait.h>
 
 typedef enum e_token_type
 {
@@ -96,7 +100,7 @@ void			print_commands(t_command *cmd_list);
 void			free_command(t_command *cmd);
 
 //================BUILT-IN UTILS================
-void			exec(t_command *cmd_line, t_envp *envp);
+void			exec(t_command *cmd_line, t_envp *envp,t_token *token);
 void			ft_echo(t_command *cmd);
 void			ft_pwd(void);
 void			ft_cd(t_command *cmd_line);
@@ -107,5 +111,21 @@ void			ft_env(t_command *cmd, t_envp *envp);
 int				len_until_char(const char *str, char c);
 void			add_envp_back(t_envp **head, t_envp *new_node);
 t_envp			*new_envp(const char *key, const char *value, bool exprt);
+
+//================EXEC UTILS================
+void		parse_and_execute(char *input, char **envp, t_envp *env);
+void		handle_pipeline(char **cmds, t_envp *env);
+void		ft_free_split(char **tab);
+char		*get_path_from_list(t_envp *env_list);
+char		*find_executable(char **chemins, char *cmd);
+char		*parsing(t_envp *env_list, char *cmd);
+void		run_command(t_command *cmd, t_envp *env_list);
+void		error(char *error_msg);
+void		errorcmd(const char *cmd, int exit_code);
+char		**env_list_to_array(t_envp *env);
+t_command	*parse_simple_command(char *input);
+void		exec_piped_commands(t_command *cmd, t_envp *env);
+void		exec_builtin(t_command *cmd, t_envp *envp);
+int			is_builtin(char *cmd);
 
 #endif
