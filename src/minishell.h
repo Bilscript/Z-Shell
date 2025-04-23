@@ -69,14 +69,14 @@ typedef struct s_token
 }	t_token;
 
 //================TOKEN UTILS================
-t_token			*tokenizer(char *input, char **envp);
+t_token			*tokenizer(char *input, t_envp *envp);
 t_token			*new_token(t_token_type namecode, char *start,
 					size_t len, t_quote_status status);
 t_quote_status	ft_lasttoken_status(t_token *lst);
 void			add_token(t_token **src, t_token *dest);
 
 void			token_dollar(char *input, size_t *i, t_token **tokens,
-					char **envp, t_quote_status qs);
+					t_envp *envp, t_quote_status qs);
 
 void			token_word(char *input, size_t *i, t_token **tokens);
 void			free_tokens(t_token *list);
@@ -84,10 +84,8 @@ void			print_tokens(t_token *list);
 int				ft_isspace(char c);
 int				is_special(char c);
 void			parse_simple_quote(char *input, size_t *i, t_token **tokens);
-void			parse_double_quote(char *input, size_t *i,
-					t_token **tokens, char **envp);
-char			*get_env_variable(char **envp,
-					char *token_value, t_quote_status status);
+void	parse_double_quote(char *input, size_t *i, t_token **tkn, t_envp *envp);
+char	*get_env_variable(t_envp *env, char *key, t_quote_status status);
 char			*ft_strndup(const char *s, size_t n);
 
 //================LEXER UTILS================
@@ -113,7 +111,7 @@ void			add_envp_back(t_envp **head, t_envp *new_node);
 t_envp			*new_envp(const char *key, const char *value, bool exprt);
 
 //================EXEC UTILS================
-void		parse_and_execute(char *input, char **envp, t_envp *env);
+void		parse_and_execute(char *input, t_envp *env);
 void		handle_pipeline(char **cmds, t_envp *env);
 void		ft_free_split(char **tab);
 char		*get_path_from_list(t_envp *env_list);
