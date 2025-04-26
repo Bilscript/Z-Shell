@@ -60,6 +60,12 @@ typedef struct s_envp
 	struct s_envp	*next;
 }	t_envp;
 
+typedef struct s_envp_list
+{
+	t_envp	*head;
+	char	**lenv;
+}	t_envp_list;
+
 typedef struct s_token
 {
 	t_token_type	type;
@@ -68,24 +74,33 @@ typedef struct s_token
 	struct s_token	*next;
 }	t_token;
 
+typedef struct s_parse_ctx
+{
+	char	*input;
+	size_t	*i;
+	char	*buf;
+	size_t	*len;
+}	t_parse_ctx;
+
 //================TOKEN UTILS================
 t_token			*tokenizer(char *input, t_envp *envp);
 t_token			*new_token(t_token_type namecode, char *start,
 					size_t len, t_quote_status status);
 t_quote_status	ft_lasttoken_status(t_token *lst);
 void			add_token(t_token **src, t_token *dest);
-
-void			token_dollar(char *input, size_t *i, t_token **tokens,
-					t_envp *envp, t_quote_status qs);
-
-void			token_word(char *input, size_t *i, t_token **tokens);
+void			token_dollar(t_parse_ctx *ctx, t_token **tkn, t_envp *envp,
+					t_quote_status sta);
+void			token_word(char *input, size_t *i,
+					t_token **tokens, t_envp *envp);
 void			free_tokens(t_token *list);
 void			print_tokens(t_token *list);
 int				ft_isspace(char c);
 int				is_special(char c);
 void			parse_simple_quote(char *input, size_t *i, t_token **tokens);
-void	parse_double_quote(char *input, size_t *i, t_token **tkn, t_envp *envp);
-char	*get_env_variable(t_envp *env, char *key, t_quote_status status);
+void			parse_double_quote(char *input, size_t *i, t_token **tkn,
+					t_envp *envp);
+char			*get_env_variable(t_envp *env, char *key,
+					t_quote_status status);
 char			*ft_strndup(const char *s, size_t n);
 
 //================LEXER UTILS================
@@ -98,7 +113,7 @@ void			print_commands(t_command *cmd_list);
 void			free_command(t_command *cmd);
 
 //================BUILT-IN UTILS================
-void			exec(t_command *cmd_line, t_envp *envp,t_token *token);
+void			exec(t_command *cmd_line, t_envp_list *envp, t_token *token);
 void			ft_echo(t_command *cmd);
 void			ft_pwd(void);
 void			ft_cd(t_command *cmd_line);
@@ -109,21 +124,23 @@ void			ft_env(t_command *cmd, t_envp *envp);
 int				len_until_char(const char *str, char c);
 void			add_envp_back(t_envp **head, t_envp *new_node);
 t_envp			*new_envp(const char *key, const char *value, bool exprt);
+char			*get_value(t_envp *envp, char *key);
+char			**envp_to_array(t_envp *envp);
 
 //================EXEC UTILS================
-void		parse_and_execute(char *input, t_envp *env);
-void		handle_pipeline(char **cmds, t_envp *env);
-void		ft_free_split(char **tab);
-char		*get_path_from_list(t_envp *env_list);
-char		*find_executable(char **chemins, char *cmd);
-char		*parsing(t_envp *env_list, char *cmd);
-void		run_command(t_command *cmd, t_envp *env_list);
-void		error(char *error_msg);
-void		errorcmd(const char *cmd, int exit_code);
-char		**env_list_to_array(t_envp *env);
-t_command	*parse_simple_command(char *input);
-void		exec_piped_commands(t_command *cmd, t_envp *env);
-void		exec_builtin(t_command *cmd, t_envp *envp);
-int			is_builtin(char *cmd);
+void			parse_and_execute(char *input, t_envp_list *env_data);
+void			handle_pipeline(char **cmds, t_envp *env);
+void			ft_free_split(char **tab);
+char			*get_path_from_list(t_envp *env_list);
+char			*find_executable(char **chemins, char *cmd);
+char			*parsing(t_envp *env_list, char *cmd);
+void			run_command(t_command *cmd, t_envp_list *env_data);
+void			error(char *error_msg);
+void			errorcmd(const char *cmd, int exit_code);
+char			**env_list_to_array(t_envp *env);
+t_command		*parse_simple_command(char *input);
+void			exec_piped_commands(t_command *cmd, t_envp_list *env_data);
+void			exec_builtin(t_command *cmd, t_envp_list *env_data);
+int				is_builtin(char *cmd);
 
 #endif

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   token_utils2.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
+/*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 12:14:09 by slebik            #+#    #+#             */
-/*   Updated: 2025/04/23 17:10:04 by slebik           ###   ########.fr       */
+/*   Updated: 2025/04/23 18:36:20 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,7 +116,7 @@ char	*get_env_variable(t_envp *env, char *key, t_quote_status status)
 {
 	int		i;
 	size_t	len;
-	char **envp;
+	char	**envp;
 
 	envp = env_list_to_array(env);
 	if (status == QUOTE_SINGLE)

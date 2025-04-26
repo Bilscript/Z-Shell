@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
+/*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 13:38:30 by bhamani           #+#    #+#             */
-/*   Updated: 2025/04/23 16:40:06 by slebik           ###   ########.fr       */
+/*   Updated: 2025/04/25 17:08:44 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ int	is_builtin(char *cmd)
 		|| !ft_strcmp(cmd, "exit"));
 }
 
-void	exec_builtin(t_command *cmd, t_envp *envp)
+void	exec_builtin(t_command *cmd, t_envp_list *env_data)
 {
 	if (!ft_strcmp(cmd->cmd, "echo"))
 		ft_echo(cmd);
@@ -34,16 +34,16 @@ void	exec_builtin(t_command *cmd, t_envp *envp)
 	else if (!ft_strcmp(cmd->cmd, "pwd"))
 		ft_pwd();
 	else if (!ft_strcmp(cmd->cmd, "export"))
-		ft_export(cmd, envp);
+		ft_export(cmd, env_data->head);
 	//else if (!ft_strcmp(cmd->cmd, "unset"))
 		//ft_unset(cmd);
 	else if (!ft_strcmp(cmd->cmd, "env"))
-		ft_env(cmd, envp);
+		ft_env(cmd, env_data->head);
 	//else if (!ft_strcmp(cmd->cmd, "exit"))
 		//ft_exit(cmd);
 }
 
-static void	exec_builtin_or_real(t_command *cmd, t_envp *envp)
+static void	exec_builtin_or_real(t_command *cmd, t_envp_list *env_data)
 {
 	if (ft_strcmp(cmd->cmd, "echo") == 0)
 		ft_echo(cmd);
@@ -52,16 +52,16 @@ static void	exec_builtin_or_real(t_command *cmd, t_envp *envp)
 	else if (ft_strcmp(cmd->cmd, "pwd") == 0)
 		ft_pwd();
 	else if (ft_strcmp(cmd->cmd, "export") == 0)
-		ft_export(cmd, envp);
+		ft_export(cmd, env_data->head);
 	//else if (ft_strcmp(cmd->cmd, "unset") == 0)
 	//	ft_unset(cmd);
 	else if (ft_strcmp(cmd->cmd, "env") == 0)
-		ft_env(cmd, envp);
+		ft_env(cmd, env_data->head);
 	//	else if (ft_strcmp(cmd->cmd, "exit") == 0)
 	//	ft_exit(cmd);
 	else
 	{
-		run_command(cmd,envp);
+		run_command(cmd, env_data);
 		// free tard plus
 		//getenv("");
 	}
@@ -77,16 +77,16 @@ int	has_pipe(t_token *tokens)
 	return (0);
 }
 
-void	exec(t_command *cmd_line, t_envp *envp, t_token *token)
+void	exec(t_command *cmd_line, t_envp_list *env_data, t_token *token)
 {
-	if (has_pipe(token)) // si ya au moins un pipe
-		exec_piped_commands(cmd_line, envp);
-	else // si ya qu'une cmd
+	if (has_pipe(token))
+		exec_piped_commands(cmd_line, env_data);
+	else
 	{
 		while (cmd_line)
 		{
 			if (cmd_line->cmd)
-				exec_builtin_or_real(cmd_line, envp);
+				exec_builtin_or_real(cmd_line, env_data);
 			cmd_line = cmd_line->next;
 		}
 	}

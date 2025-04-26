@@ -6,7 +6,7 @@
 /*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 17:21:26 by bhamani           #+#    #+#             */
-/*   Updated: 2025/04/21 18:41:26 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/04/25 19:43:11 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,6 +91,7 @@ t_envp	*get_env(char **env)
 				ft_strndup(env[i], len),
 				ft_strdup(env[i] + len + 1), false));
 		i++;
+		printf("new env alloc n°%d\n", i);
 	}
 	return (res);
 }

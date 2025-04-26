@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipe_gestion.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
+/*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 17:49:19 by slebik            #+#    #+#             */
-/*   Updated: 2025/04/23 17:04:17 by slebik           ###   ########.fr       */
+/*   Updated: 2025/04/25 17:11:50 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,18 +39,18 @@ void	ft_free_split(char **tab)
 	free(tab);
 }
 
-char *get_path_from_list(t_envp *env_list)
+char	*get_path_from_list(t_envp *env_list)
 {
-    t_envp *current;
-    
+	t_envp	*current;
+
 	current = env_list;
-    while (current)
-    {
-        if (ft_strcmp(current->key, "PATH") == 0)
-            return (current->value);
-        current = current->next;
-    }
-    return (NULL);
+	while (current)
+	{
+		if (ft_strcmp(current->key, "PATH") == 0)
+			return (current->value);
+		current = current->next;
+	}
+	return (NULL);
 }
 
 char	*find_executable(char **chemins, char *cmd)
@@ -88,7 +88,7 @@ char *parsing(t_envp *env_list, char *cmd)
 		return (cmd);
 	if (!cmd || !cmd[0])
 		return (NULL);
-	path_val = get_path_from_list(env_list);
+	path_val = get_value(env_list, "PATH");
 	if (!path_val)
 		return (NULL);
 	chemins = ft_split(path_val, ':');
@@ -97,25 +97,25 @@ char *parsing(t_envp *env_list, char *cmd)
 	return (find_executable(chemins, cmd));
 }
 
-void	run_command(t_command *cmd, t_envp *env_list)
+void	run_command(t_command *cmd, t_envp_list *env_data)
 {
 	pid_t	pid;
 	int		status;
-	char	**envp_array;
+	//char	**envp_array;
 	char	*path;
 
 	if (!cmd || !cmd->cmd)
 		return;
-	envp_array = env_list_to_array(env_list);
-	if (!envp_array)
-		error("env conversion failed");
-	path = parsing(env_list, cmd->cmd);
+	//envp_array = env_list_to_array(env_list);
+	//if (!envp_array)
+	//	error("env conversion failed");
+	path = parsing(env_data->head, cmd->cmd);
 	if (!path)
 	{
 		ft_putstr_fd(cmd->cmd, 2);
 		ft_putstr_fd(": command not found\n", 2);
-		ft_free_split(envp_array);
-		return;
+		//ft_free_split(envp_array);
+		return ;
 	}
 	pid = fork();
 	if (pid < 0)
@@ -123,12 +123,12 @@ void	run_command(t_command *cmd, t_envp *env_list)
 		perror("fork failed");
 		printf("free path\n");
 		free(path);
-		ft_free_split(envp_array);
+		//ft_free_split(envp_array);
 		return;
 	}
 	if (pid == 0)
 	{
-		execve(path, cmd->args, envp_array);
+		execve(path, cmd->args, env_data->lenv);
 		perror("execve failed");
 		exit(EXIT_FAILURE);
 	}
@@ -136,7 +136,7 @@ void	run_command(t_command *cmd, t_envp *env_list)
 	{
 		waitpid(pid, &status, 0);
 		// free(path); celui a causer le double free
-		ft_free_split(envp_array);
+		//ft_free_split(envp_array);
 	}
 }
 
@@ -178,20 +178,20 @@ void	handle_redirections(t_redir *redir)
 	}
 }
 
-void	exec_piped_commands(t_command *cmd, t_envp *env)
+void	exec_piped_commands(t_command *cmd, t_envp_list *env_data)
 {
 	int		fd[2];
 	int		in_fd = 0;
 	pid_t	pid;
 	int		status;
-	char	**envp_array;
+	//char	**envp_array;
 	char	*path;
 
 	while (cmd)
 	{
-		envp_array = env_list_to_array(env);
-		if (!envp_array)
-			error("env conversion failed");
+		//envp_array = env_list_to_array(env_data.head);
+		//if (!envp_array)
+		//	error("env conversion failed");
 		if (cmd->next && pipe(fd) == -1)
 			error("pipe failed");
 		pid = fork();
@@ -213,19 +213,19 @@ void	exec_piped_commands(t_command *cmd, t_envp *env)
 			handle_redirections(cmd->redirs); // ca marche mais je gere pas les erreur
 			if (is_builtin(cmd->cmd))
 			{
-				exec_builtin(cmd, env);
+				exec_builtin(cmd, env_data);
 				exit(EXIT_SUCCESS);
 			}
 			// si c un built in ca l'exec puis on stop avec un exit manuel
 			// Si c pas un built in
-			path = parsing(env, cmd->cmd);
+			path = parsing(env_data->head, cmd->cmd);
 			if (!path)
 			{
 				ft_putstr_fd(cmd->cmd, 2);
 				ft_putstr_fd(": command not found\n", 2);
 				exit(127);
 			}
-			execve(path, cmd->args, envp_array);
+			execve(path, cmd->args, env_data->lenv);
 			perror("execve failed");
 			exit(1);
 		}
@@ -247,82 +247,65 @@ void	exec_piped_commands(t_command *cmd, t_envp *env)
 				close(fd[0]);
 		}
 
-		ft_free_split(envp_array);
+		//ft_free_split(envp_array);
 		cmd = cmd->next;
 	}
-	while (wait(&status) > 0) ;
+
+	while (wait(&status) > 0
+	);
 }
 
 static char **free_array_and_return_null(char **array, int count)
 {
-    int i;
-    
-    i = 0;
-    while (i < count)
-    {
-        free(array[i]);
-        i++;
-    }
-    free(array);
-    return (NULL);
+	int i;
+
+	i = 0;
+	while (i < count)
+	{
+		free(array[i]);
+		i++;
+	}
+	free(array);
+	return (NULL);
 }
 
 char **env_list_to_array(t_envp *env)
 {
-    int count;
-    char **array;
-    t_envp *cur;
-    char *tmp;
-    
-    count = 0;
-    cur = env;
-    while (cur)
-    {
-        if (cur->export)
-            count++;
-        cur = cur->next;
-    }
-    array = malloc(sizeof(char *) * (count + 1));
-    if (!array)
-        return (NULL);
-    cur = env;
-    count = 0;
-    while (cur)
-    {
-        if (cur->export)
-        {
-            if (!cur->key)
-                return (free_array_and_return_null(array, count));
-                
-            tmp = ft_strjoin(cur->key, "=");
-            if (!tmp)
-                return (free_array_and_return_null(array, count));
-            
-            array[count] = ft_strjoin(tmp, cur->value ? cur->value : "");
-            free(tmp);
-            
-            if (!array[count])
-                return (free_array_and_return_null(array, count));
-            
-            count++;
-        }
-        cur = cur->next;
-    }
-    array[count] = NULL;
-    return (array);
+	int count;
+	char **array;
+	t_envp *cur;
+	char *tmp;
+
+	count = 0;
+	cur = env;
+	while (cur)
+	{
+		if (cur->export)
+			count++;
+		cur = cur->next;
+	}
+	array = malloc(sizeof(char *) * (count + 1));
+	if (!array)
+		return (NULL);
+	cur = env;
+	count = 0;
+	while (cur)
+	{
+		if (cur->export)
+		{
+			if (!cur->key)
+				return (free_array_and_return_null(array, count));
+			tmp = ft_strjoin(cur->key, "=");
+			if (!tmp)
+				return (free_array_and_return_null(array, count));
+			array[count] = ft_strjoin(tmp, cur->value ? cur->value : "");
+			free(tmp);
+			if (!array[count])
+				return (free_array_and_return_null(array, count));
+			count++;
+		}
+		cur = cur->next;
+	}
+	array[count] = NULL;
+	return (array);
 }
-
-void	parse_and_execute(char *input, t_envp *env)
-{
-	t_token		*token;
-	t_command	*command;
-
-	token = tokenizer(input, env);
-	print_tokens(token); //debug
-	command = lexer(token);
-	print_commands(command); ///debug
-	exec(command, env, token);
-	free_tokens(token);
-	free_command(command);
-}
-
