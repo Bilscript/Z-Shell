@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipe_gestion.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
+/*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 17:49:19 by slebik            #+#    #+#             */
-/*   Updated: 2025/04/25 17:11:50 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/04/26 16:58:22 by slebik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,121 +138,6 @@ void	run_command(t_command *cmd, t_envp_list *env_data)
 		// free(path); celui a causer le double free
 		//ft_free_split(envp_array);
 	}
-}
-
-void	handle_redirections(t_redir *redir)
-{
-	int	fd;
-
-	while (redir)
-	{
-		if (redir->type == TOKEN_REDIR_OUT)
-		{
-			fd = open(redir->filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-			if (fd < 0)
-				error("open > failed");
-			dup2(fd, STDOUT_FILENO);
-			close(fd);
-		}
-		else if (redir->type == TOKEN_APPEND)
-		{
-			fd = open(redir->filename, O_WRONLY | O_CREAT | O_APPEND, 0644);
-			if (fd < 0)
-				error("open >> failed");
-			dup2(fd, STDOUT_FILENO);
-			close(fd);
-		}
-		else if (redir->type == TOKEN_REDIR_IN)
-		{
-			fd = open(redir->filename, O_RDONLY);
-			if (fd < 0)
-				error("open < failed");
-			dup2(fd, STDIN_FILENO);
-			close(fd);
-		}
-		/* else if (redir->type == TOKEN_HEREDOC)
-		{
-		
-		} */
-		redir = redir->next;
-	}
-}
-
-void	exec_piped_commands(t_command *cmd, t_envp_list *env_data)
-{
-	int		fd[2];
-	int		in_fd = 0;
-	pid_t	pid;
-	int		status;
-	//char	**envp_array;
-	char	*path;
-
-	while (cmd)
-	{
-		//envp_array = env_list_to_array(env_data.head);
-		//if (!envp_array)
-		//	error("env conversion failed");
-		if (cmd->next && pipe(fd) == -1)
-			error("pipe failed");
-		pid = fork();
-		if (pid == 0)
-		{
-			// Duplication entrée (si pipe précédent)
-			if (in_fd != 0)
-			{
-				dup2(in_fd, STDIN_FILENO);
-				close(in_fd);
-			}
-			// Duplication sortie (si pipe suivant)
-			if (cmd->next)
-			{
-				close(fd[0]); // Ne lit pas
-				dup2(fd[1], STDOUT_FILENO);
-				close(fd[1]);
-			}
-			handle_redirections(cmd->redirs); // ca marche mais je gere pas les erreur
-			if (is_builtin(cmd->cmd))
-			{
-				exec_builtin(cmd, env_data);
-				exit(EXIT_SUCCESS);
-			}
-			// si c un built in ca l'exec puis on stop avec un exit manuel
-			// Si c pas un built in
-			path = parsing(env_data->head, cmd->cmd);
-			if (!path)
-			{
-				ft_putstr_fd(cmd->cmd, 2);
-				ft_putstr_fd(": command not found\n", 2);
-				exit(127);
-			}
-			execve(path, cmd->args, env_data->lenv);
-			perror("execve failed");
-			exit(1);
-		}
-		else if (pid < 0)
-			error("fork failed");
-
-		// dans lprocess parent : gestion des fd
-		if (in_fd != 0)
-			close(in_fd);
-		if (cmd->next)
-		{
-			close(fd[1]); // On n'écrit plus dans le pipe
-			in_fd = fd[0]; // Et on lit avec ça la prochaine fois
-		}
-		else
-		{
-			// on ferme tt pr la last cmd
-			if (fd[0])
-				close(fd[0]);
-		}
-
-		//ft_free_split(envp_array);
-		cmd = cmd->next;
-	}
-
-	while (wait(&status) > 0
-	);
 }
 
 static char **free_array_and_return_null(char **array, int count)

@@ -40,6 +40,7 @@ typedef struct s_redir
 {
 	int				type;
 	char			*filename;
+	int				heredoc_fd;
 	struct s_redir	*next;
 }	t_redir;
 
@@ -142,5 +143,24 @@ t_command		*parse_simple_command(char *input);
 void			exec_piped_commands(t_command *cmd, t_envp_list *env_data);
 void			exec_builtin(t_command *cmd, t_envp_list *env_data);
 int				is_builtin(char *cmd);
+
+char	*ft_strjoin_char(char *str, char c);
+int		get_next_line(char **line);
+
+void	here_doc_child(int *fd, char *limiter);
+void	here_doc_parent(int *fd);
+int		handle_here_doc(char *limiter);
+void	write_to_pipe(int fd, char *line);
+void	exec_piped_commands(t_command *cmd, t_envp_list *env_data);
+void	handle_parent(t_command *current, int *in_fd, int *fd);
+void	exec_command_children(t_command *current, t_envp_list *env_data, int in_fd);
+void	prepare_child(t_command *current, int in_fd, int *fd);
+void	prepare_heredocs(t_command *cmd);
+
+void	handle_input_redir(t_redir *redir);
+void	handle_output_redir(t_redir *redir);
+void	handle_append_redir(t_redir *redir);
+void	handle_heredoc_redir(t_redir *redir);
+void	handle_redirections(t_command *cmd);
 
 #endif

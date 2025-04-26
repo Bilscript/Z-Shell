@@ -6,6 +6,7 @@ LIBFT_DIR	:= libft
 LIBFT		:= $(LIBFT_DIR)/libft.a
 CC			:= gcc
 CFLAGS		:= -Wall -Wextra -Werror -I$(LIBFT_DIR) -I$(SRC_DIR)
+#CFLAGS		:= -g -I$(LIBFT_DIR) -I$(SRC_DIR)
 LDFLAGS		:= -lreadline
 
 SRC			:= $(wildcard $(SRC_DIR)/*.c) # PAS LE DROIT A WILDCARD
