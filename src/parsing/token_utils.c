@@ -24,7 +24,7 @@ int	is_special(char c)
 		|| c == '"' || c == '\'' || c == '$');
 }
 
-void print_tokens(t_token *list)
+void	print_tokens(t_token *list)
 {
 	const char *g_token_names[] =
 	{
@@ -35,10 +35,41 @@ void print_tokens(t_token *list)
 	{
 		"QUOTE_NONE", "QUOTE_SINGLE", "QUOTE_DOUBLE"
 	};
-	
-	while (list) 
+	while (list)
 	{
 		printf("Type: %s, Value: [%s] , Quote status: %s \n", g_token_names[list->type], list->value, g_quote_status[list->quote_status]);
 		list = list->next;
+	}
+}
+
+void	print_commands(t_command *cmd_list)
+{
+	const char *redir_types[] = {
+		"REDIR_IN", "REDIR_OUT", "APPEND", "HEREDOC"
+	};
+
+	while (cmd_list)
+	{
+		printf("=== Command ===\n");
+		printf("Command: %s\n", cmd_list->cmd ? cmd_list->cmd : "(null)");
+		printf("Arguments:\n");
+		if (cmd_list->args)
+		{
+			for (int i = 0; cmd_list->args[i]; i++)
+				printf("  - [%s]\n", cmd_list->args[i]);
+		}
+		else
+			printf("  (none)\n");
+		printf("Redirections:\n");
+		t_redir *redir = cmd_list->redirs;
+		if (!redir)
+			printf("  - (Aucune redirection)\n");
+		while (redir)
+		{
+			printf("  - Type: %s, File: [%s]\n", redir_types[redir->type - TOKEN_REDIR_IN], redir->filename);
+			redir = redir->next;
+		}
+		printf("\n");
+		cmd_list = cmd_list->next;
 	}
 }

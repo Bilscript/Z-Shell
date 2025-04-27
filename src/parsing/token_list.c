@@ -27,26 +27,11 @@ void	add_token(t_token **src, t_token *dest)
 	}
 }
 
-void	free_tokens(t_token *list)
-{
-	t_token	*tmp;
-
-	while (list)
-	{
-		tmp = list->next;
-		free(list->value);
-		free(list);
-		list = tmp;
-	}
-}
-
-t_token *new_token(t_token_type type,
-	char *start,
-	size_t len,
-	t_quote_status q_s)
+t_token	*new_token(t_token_type type, char *start,
+	size_t len, t_quote_status q_s)
 
 {
-	t_token *tok;
+	t_token	*tok;
 
 	tok = malloc(sizeof(*tok));
 	if (!tok)

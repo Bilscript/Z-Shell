@@ -6,7 +6,7 @@
 /*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 17:49:19 by slebik            #+#    #+#             */
-/*   Updated: 2025/04/26 22:23:45 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/04/27 12:08:04 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,21 +22,6 @@ void	errorcmd(const char *cmd, int exit_code)
 {
 	perror(cmd);
 	exit(exit_code);
-}
-
-void	ft_free_split(char **tab)
-{
-	int	i;
-
-	i = 0;
-	if (!tab)
-		return ;
-	while (tab[i])
-	{
-		free(tab[i]);
-		i++;
-	}
-	free(tab);
 }
 
 char	*get_path_from_list(t_envp *env_list)
@@ -79,7 +64,7 @@ char	*find_executable(char **chemins, char *cmd)
 	return (ft_free_split(chemins), NULL);
 }
 
-char *parsing(t_envp *env_list, char *cmd)
+char	*parsing(t_envp *env_list, char *cmd)
 {
 	char	*path_val;
 	char	**chemins;
@@ -97,49 +82,7 @@ char *parsing(t_envp *env_list, char *cmd)
 	return (find_executable(chemins, cmd));
 }
 
-void	run_command(t_command *cmd, t_envp_list *env_data)
-{
-	pid_t	pid;
-	int		status;
-	//char	**envp_array;
-	char	*path;
-
-	if (!cmd || !cmd->cmd)
-		return;
-	//envp_array = env_list_to_array(env_list);
-	//if (!envp_array)
-	//	error("env conversion failed");
-	path = parsing(env_data->head, cmd->cmd);
-	if (!path)
-	{
-		ft_putstr_fd(cmd->cmd, 2);
-		ft_putstr_fd(": command not found\n", 2);
-		//ft_free_split(envp_array);
-		return ;
-	}
-	pid = fork();
-	if (pid < 0)
-	{
-		perror("fork failed");
-		printf("free path\n");
-		free(path);
-		//ft_free_split(envp_array);
-		return;
-	}
-	if (pid == 0)
-	{
-		execve(path, cmd->args, env_data->lenv);
-		perror("execve failed");
-		exit(EXIT_FAILURE);
-	}
-	else
-	{
-		waitpid(pid, &status, 0);
-		// free(path); celui a causer le double free
-		//ft_free_split(envp_array);
-	}
-}
-
+/*
 static char **free_array_and_return_null(char **array, int count)
 {
 	int i;
@@ -153,7 +96,8 @@ static char **free_array_and_return_null(char **array, int count)
 	free(array);
 	return (NULL);
 }
-
+*/
+/*
 char **env_list_to_array(t_envp *env)
 {
 	int		count;
@@ -194,3 +138,4 @@ char **env_list_to_array(t_envp *env)
 	array[count] = NULL;
 	return (array);
 }
+*/

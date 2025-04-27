@@ -28,8 +28,8 @@ void	prepare_child(t_command *current, int in_fd, int *fd)
 		dup2(in_fd, STDIN_FILENO);
 		close(in_fd);
 	}
-	// Si c'est un "cat" sans arguments dans un pipeline et que l'entrée standard n'a pas été redirigée, on connecte /dev/null à stdin pour éviter le blocage
-	else if (ft_strcmp(current->cmd, "cat") == 0 && !current->args[1] && current->next) // gestion du cas cat cat sleep a la shlag mais voir si ca impacte pas le reste
+	else if (ft_strcmp(current->cmd, "cat") == 0
+		&& !current->args[1] && current->next)
 	{
 		null_fd = open("/dev/null", O_RDONLY);
 		if (null_fd != -1)

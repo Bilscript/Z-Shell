@@ -6,7 +6,7 @@
 /*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 13:38:30 by bhamani           #+#    #+#             */
-/*   Updated: 2025/04/25 17:08:44 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/04/27 12:05:35 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,16 +66,6 @@ static void	exec_builtin_or_real(t_command *cmd, t_envp_list *env_data)
 		//getenv("");
 	}
 }
-int	has_pipe(t_token *tokens)
-{
-	while (tokens)
-	{
-		if (tokens->type == TOKEN_PIPE)
-			return (1);
-		tokens = tokens->next;
-	}
-	return (0);
-}
 
 void	exec(t_command *cmd_line, t_envp_list *env_data, t_token *token)
 {
@@ -90,4 +80,37 @@ void	exec(t_command *cmd_line, t_envp_list *env_data, t_token *token)
 			cmd_line = cmd_line->next;
 		}
 	}
+}
+
+void	run_command(t_command *cmd, t_envp_list *env_data)
+{
+	pid_t	pid;
+	int		status;
+	char	*path;
+
+	if (!cmd || !cmd->cmd)
+		return ;
+	path = parsing(env_data->head, cmd->cmd);
+	if (!path)
+	{
+		ft_putstr_fd(cmd->cmd, 2);
+		ft_putstr_fd(": command not found\n", 2);
+		return ;
+	}
+	pid = fork();
+	if (pid < 0)
+	{
+		perror("fork failed");
+		printf("free path\n");
+		free(path);
+		return ;
+	}
+	if (pid == 0)
+	{
+		execve(path, cmd->args, env_data->lenv);
+		perror("execve failed");
+		exit(EXIT_FAILURE);
+	}
+	else
+		waitpid(pid, &status, 0);
 }

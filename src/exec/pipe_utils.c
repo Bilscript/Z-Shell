@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipex_gnl.c                                        :+:      :+:    :+:   */
+/*   pipe_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
+/*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/04/26 16:04:13 by slebik            #+#    #+#             */
-/*   Updated: 2025/04/26 16:04:13 by slebik           ###   ########.fr       */
+/*   Created: 2025/04/27 12:06:19 by bhamani           #+#    #+#             */
+/*   Updated: 2025/04/27 12:06:19 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,4 +52,30 @@ int	get_next_line(char **line)
 	}
 	*line = str;
 	return (ret);
+}
+
+int	has_pipe(t_token *tokens)
+{
+	while (tokens)
+	{
+		if (tokens->type == TOKEN_PIPE)
+			return (1);
+		tokens = tokens->next;
+	}
+	return (0);
+}
+
+void	ft_free_split(char **tab)
+{
+	int	i;
+
+	i = 0;
+	if (!tab)
+		return ;
+	while (tab[i])
+	{
+		free(tab[i]);
+		i++;
+	}
+	free(tab);
 }

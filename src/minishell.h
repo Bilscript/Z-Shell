@@ -175,4 +175,17 @@ void			handle_append_redir(t_redir *redir);
 void			handle_heredoc_redir(t_redir *redir);
 void			handle_redirections(t_command *cmd);
 
+void			handle_redir_out(char *input, size_t *i, t_token **tkns);
+void			handle_redir_in(char *input, size_t *i, t_token **tokens);
+void			accolade_gestion(char *input, size_t *i, char **tmp);
+void			get_pid_var(char **value, size_t *i, t_token **tkn,
+					t_quote_status q_st);
+void			handle_single_quote(t_parse_ctx *ctx);
+void			handle_double_quote(t_parse_ctx *ctx, t_envp *envp);
+void			handle_variable(t_parse_ctx *ctx, t_envp *envp);
+t_parse_ctx		init_parse_ctx(char *input, size_t *i, char *buf, size_t *len);
+int				has_pipe(t_token *tokens);
+void			free_envp_list(t_envp_list *envp_list);
+void			free_tab(char **tab);
+
 #endif

@@ -6,12 +6,12 @@
 /*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 12:14:09 by slebik            #+#    #+#             */
-/*   Updated: 2025/04/26 22:21:01 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/04/27 11:38:55 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
+/*
 char	*strjoin_and_free(char *s1, char *s2)
 {
 	char	*new;
@@ -135,3 +135,4 @@ char	*get_env_variable(t_envp *env, char *key, t_quote_status status)
 	}
 	return (NULL);
 }
+*/
