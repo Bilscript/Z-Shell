@@ -67,6 +67,13 @@ void	token_dollar(t_parse_ctx *ctx, t_token **tkn, t_envp *envp,
 	}
 	if (ctx->input[*ctx->i] == '{')
 		accolade_gestion(ctx->input, ctx->i, &tmp);
+	else if (!ctx->input[*ctx->i] || ft_isspace(ctx->input[*ctx->i])
+		|| ctx->input[*ctx->i] == '|' || ctx->input[*ctx->i] == '<'
+		|| ctx->input[*ctx->i] == '>')
+	{
+		add_token(tkn, new_token(TOKEN_WORD, "$", 1, sta));
+		return ;
+	}
 	else
 	{
 		while (ctx->input[*ctx->i] && (ft_isalnum(ctx->input[*ctx->i])

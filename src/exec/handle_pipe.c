@@ -97,7 +97,6 @@ void	handle_parent(t_command *current, int *in_fd, int *fd)
 	}
 }
 
-// ft principale de gestion des commandes avec pipes
 void	exec_piped_commands(t_command *cmd, t_envp_list *env_data)
 {
 	int			fd[2];

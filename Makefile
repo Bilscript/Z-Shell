@@ -22,6 +22,7 @@ SRC     = \
 	src/main.c \
 	src/built-in/ft_cd.c \
 	src/built-in/ft_echo.c \
+	src/built-in/ft_unset.c \
 	src/built-in/ft_env.c \
 	src/built-in/ft_export.c \
 	src/built-in/ft_pwd.c \

@@ -27,6 +27,8 @@
 # include <sys/types.h>
 # include <sys/wait.h>
 
+extern int g_exit_status;
+
 typedef enum e_token_type
 {
 	TOKEN_WORD,
@@ -131,6 +133,7 @@ void			ft_echo(t_command *cmd);
 void			ft_pwd(void);
 void			ft_cd(t_command *cmd_line);
 void			ft_export(t_command *cmd, t_envp *envp);
+void			ft_unset(t_command *cmd, t_envp *envp);
 t_envp			*new_envp(const char *key, const char *value, bool exprt);
 t_envp			*get_env(char **env);
 void			ft_env(t_command *cmd, t_envp *envp);

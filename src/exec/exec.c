@@ -6,7 +6,7 @@
 /*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 13:38:30 by bhamani           #+#    #+#             */
-/*   Updated: 2025/04/27 12:05:35 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/04/27 13:38:47 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,8 +53,8 @@ static void	exec_builtin_or_real(t_command *cmd, t_envp_list *env_data)
 		ft_pwd();
 	else if (ft_strcmp(cmd->cmd, "export") == 0)
 		ft_export(cmd, env_data->head);
-	//else if (ft_strcmp(cmd->cmd, "unset") == 0)
-	//	ft_unset(cmd);
+	else if (ft_strcmp(cmd->cmd, "unset") == 0)
+		ft_unset(cmd, env_data->head);
 	else if (ft_strcmp(cmd->cmd, "env") == 0)
 		ft_env(cmd, env_data->head);
 	//	else if (ft_strcmp(cmd->cmd, "exit") == 0)
