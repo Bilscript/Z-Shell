@@ -61,8 +61,6 @@ t_token *new_token(t_token_type type,
 	return (tok);
 }
 
-
-
 t_quote_status	ft_lasttoken_status(t_token *lst)
 {
 	t_token	*temp;

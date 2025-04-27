@@ -125,7 +125,6 @@ void	free_envp_list(t_envp_list *envp_list)
 	}
 }
 
-
 void	parse_and_execute(char *input, t_envp_list *env_data)
 {
 	t_token		*token;
@@ -141,7 +140,6 @@ void	parse_and_execute(char *input, t_envp_list *env_data)
 	free_tokens(token);
 	free_command(command);
 }
-
 
 int main(int ac, char **av, char **envp)
 {

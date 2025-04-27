@@ -6,7 +6,7 @@
 /*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/17 16:18:26 by bhamani           #+#    #+#             */
-/*   Updated: 2025/04/23 13:22:32 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/04/26 22:20:00 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ t_command	*new_command(void)
 
 	cmd = malloc(sizeof(t_command));
 	if (!cmd)
-		return NULL;
+		return (NULL);
 	cmd->cmd = NULL;
 	cmd->args = NULL;
 	cmd->redirs = NULL;
@@ -93,7 +93,6 @@ void	add_arg(t_command *cmd, const char *word)
 	if (!cmd->cmd)
 		cmd->cmd = cmd->args[0];
 }
-
 
 void	free_args(char **args)
 {

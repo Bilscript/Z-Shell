@@ -1,4 +1,3 @@
-# === Variables ===
 NAME		:= Z-Shell
 SRC_DIR		:= src
 OBJ_DIR		:= obj
@@ -36,4 +35,4 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: all clean fclean re
+.PHONY: all clean fclean re 

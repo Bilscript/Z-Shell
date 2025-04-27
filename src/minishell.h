@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   minishell.h                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/04/26 22:17:51 by bhamani           #+#    #+#             */
+/*   Updated: 2025/04/26 22:17:51 by bhamani          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
@@ -18,14 +30,14 @@
 typedef enum e_token_type
 {
 	TOKEN_WORD,
-	TOKEN_PIPE,			// |
-	TOKEN_REDIR_IN,		// < Ça remplace l'entrée standard par le contenu d'un fichier par ex command < fichier
-	TOKEN_REDIR_OUT,	// > redirection vers un fichier qui sera cree ou qui sera ecrase si il existe deja par ex command > fichier
-	TOKEN_APPEND,		// >> ajt a la fin d'un fichier
-	TOKEN_HEREDOC,		// << heredoc
-	TOKEN_DQUOTE,		// " quasi comme simple quote sauf que ex echo '$USER' affiche la valeur de la variable et non "$USER".
-	TOKEN_SQUOTE,		// ' tt ce qui est entre simple quote est pris litteralement, par ex echo '$USER' affiche $USER et non la valeur de la variable.
-	TOKEN_VAR,			// $
+	TOKEN_PIPE,
+	TOKEN_REDIR_IN,
+	TOKEN_REDIR_OUT,
+	TOKEN_APPEND,
+	TOKEN_HEREDOC,
+	TOKEN_DQUOTE,
+	TOKEN_SQUOTE,
+	TOKEN_VAR,
 	TOKEN_EOF
 }	t_token_type;
 
@@ -144,23 +156,23 @@ void			exec_piped_commands(t_command *cmd, t_envp_list *env_data);
 void			exec_builtin(t_command *cmd, t_envp_list *env_data);
 int				is_builtin(char *cmd);
 
-char	*ft_strjoin_char(char *str, char c);
-int		get_next_line(char **line);
+char			*ft_strjoin_char(char *str, char c);
+int				get_next_line(char **line);
 
-void	here_doc_child(int *fd, char *limiter);
-void	here_doc_parent(int *fd);
-int		handle_here_doc(char *limiter);
-void	write_to_pipe(int fd, char *line);
-void	exec_piped_commands(t_command *cmd, t_envp_list *env_data);
-void	handle_parent(t_command *current, int *in_fd, int *fd);
-void	exec_command_children(t_command *current, t_envp_list *env_data, int in_fd);
-void	prepare_child(t_command *current, int in_fd, int *fd);
-void	prepare_heredocs(t_command *cmd);
-
-void	handle_input_redir(t_redir *redir);
-void	handle_output_redir(t_redir *redir);
-void	handle_append_redir(t_redir *redir);
-void	handle_heredoc_redir(t_redir *redir);
-void	handle_redirections(t_command *cmd);
+void			here_doc_child(int *fd, char *limiter);
+void			here_doc_parent(int *fd);
+int				handle_here_doc(char *limiter);
+void			write_to_pipe(int fd, char *line);
+void			exec_piped_commands(t_command *cmd, t_envp_list *env_data);
+void			handle_parent(t_command *current, int *in_fd, int *fd);
+void			exec_command_children(t_command *current, t_envp_list *env_data,
+					int in_fd);
+void			prepare_child(t_command *current, int in_fd, int *fd);
+void			prepare_heredocs(t_command *cmd);
+void			handle_input_redir(t_redir *redir);
+void			handle_output_redir(t_redir *redir);
+void			handle_append_redir(t_redir *redir);
+void			handle_heredoc_redir(t_redir *redir);
+void			handle_redirections(t_command *cmd);
 
 #endif

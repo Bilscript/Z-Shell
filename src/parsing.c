@@ -132,7 +132,7 @@ void	accolade_gestion(char *input, size_t *i, char **tmp)
 	}
 }
 
-void token_dollar(t_parse_ctx *ctx, t_token **tkn, t_envp *envp,
+void	token_dollar(t_parse_ctx *ctx, t_token **tkn, t_envp *envp,
 					t_quote_status sta)
 {
 	size_t	start;
@@ -205,7 +205,7 @@ void	tokenize_special(char *input, size_t *i, t_token **tokens)
 		handle_redir_out(input, i, tokens);
 }
 
-t_token *tokenizer(char *input, t_envp *envp)
+t_token	*tokenizer(char *input, t_envp *envp)
 {
 	size_t		i;
 	t_token		*tokens;

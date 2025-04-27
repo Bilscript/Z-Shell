@@ -6,7 +6,7 @@
 /*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 12:14:09 by slebik            #+#    #+#             */
-/*   Updated: 2025/04/23 18:36:20 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/04/26 22:21:01 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,8 @@ char	*strjoin_and_free(char *s1, char *s2)
 	return (new);
 }
 
-char	*extract_dollar(char *input, size_t *i, t_envp *envp, t_quote_status sta)
+char	*extract_dollar(char *input, size_t *i,
+			t_envp *envp, t_quote_status sta)
 {
 	char	*key;
 	char	*value;
@@ -85,7 +86,8 @@ void	parse_double_quote(char *input, size_t *i, t_token **tkn, t_envp *envp)
 		(*i)++;
 	else
 		printf("\033[0;31mSyntax error: unclosed double quote\033[0m\n");
-	add_token(tkn, new_token(TOKEN_WORD, joined, ft_strlen(joined), QUOTE_DOUBLE));
+	add_token(tkn, new_token(TOKEN_WORD, joined,
+			ft_strlen(joined), QUOTE_DOUBLE));
 	free(joined);
 }
 
@@ -104,13 +106,13 @@ void	parse_simple_quote(char *input, size_t *i, t_token **tokens)
 		(*i)++;
 	if (input[*i] == '\'')
 	{
-		add_token(tokens, new_token(TOKEN_WORD, &input[start], *i - start, QUOTE_SINGLE));
+		add_token(tokens, new_token(TOKEN_WORD, &input[start],
+				*i - start, QUOTE_SINGLE));
 		(*i)++;
 	}
 	else
 		printf("\033[0;31mSyntax error: unclosed single quote\033[0m\n");
 }
-
 
 char	*get_env_variable(t_envp *env, char *key, t_quote_status status)
 {

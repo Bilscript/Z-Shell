@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipe_gestion.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
+/*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 17:49:19 by slebik            #+#    #+#             */
-/*   Updated: 2025/04/26 16:58:22 by slebik           ###   ########.fr       */
+/*   Updated: 2025/04/26 22:23:45 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,10 +156,10 @@ static char **free_array_and_return_null(char **array, int count)
 
 char **env_list_to_array(t_envp *env)
 {
-	int count;
-	char **array;
-	t_envp *cur;
-	char *tmp;
+	int		count;
+	char	**array;
+	t_envp	*cur;
+	char	*tmp;
 
 	count = 0;
 	cur = env;
