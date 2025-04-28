@@ -19,32 +19,36 @@ void	write_to_pipe(int fd, char *line)
 	free(line);
 }
 
-void	prepare_child(t_command *current, int in_fd, int *fd)
+void prepare_child(t_command *current, int in_fd, int *fd)
 {
-	int	null_fd;
+    int				null_fd;
+    t_stdio_backup	backup;
 
-	if (in_fd != 0)
-	{
-		dup2(in_fd, STDIN_FILENO);
-		close(in_fd);
-	}
-	else if (ft_strcmp(current->cmd, "cat") == 0
-		&& !current->args[1] && current->next)
-	{
-		null_fd = open("/dev/null", O_RDONLY);
-		if (null_fd != -1)
-		{
-			dup2(null_fd, STDIN_FILENO);
-			close(null_fd);
-		}
-	}
-	if (current->next)
-	{
-		close(fd[0]);
-		dup2(fd[1], STDOUT_FILENO);
-		close(fd[1]);
-	}
-	handle_redirections(current);
+    save_stdio(&backup);
+    if (in_fd != 0)
+    {
+        dup2(in_fd, STDIN_FILENO);
+        close(in_fd);
+    }
+    else if (ft_strcmp(current->cmd, "cat") == 0
+             && !current->args[1] && current->next)
+    {
+        null_fd = open("/dev/null", O_RDONLY);
+        if (null_fd != -1)
+        {
+            dup2(null_fd, STDIN_FILENO);
+            close(null_fd);
+        }
+    }
+    if (current->next)
+    {
+        close(fd[0]);
+        dup2(fd[1], STDOUT_FILENO);
+        close(fd[1]);
+    }
+    handle_redirections(current);
+    // Si besoin de restaurer plus tard dans le parent
+    restore_stdio(&backup);
 }
 
 void	exec_command_children(t_command *current, t_envp_list *env_data, int fd)

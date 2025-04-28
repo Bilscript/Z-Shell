@@ -81,6 +81,12 @@ typedef struct s_envp_list
 	char	**lenv;
 }	t_envp_list;
 
+typedef struct s_stdio_backup
+{
+    int stdin_copy;
+    int stdout_copy;
+} t_stdio_backup;
+
 typedef struct s_token
 {
 	t_token_type	type;
@@ -192,5 +198,11 @@ t_parse_ctx		init_parse_ctx(char *input, size_t *i, char *buf, size_t *len);
 int				has_pipe(t_token *tokens);
 void			free_envp_list(t_envp_list *envp_list);
 void			free_tab(char **tab);
+
+void	exec_builtin_or_real(t_command *cmd, t_envp_list *env_data);
+void	save_stdio(t_stdio_backup *backup);
+void	restore_stdio(t_stdio_backup *backup);
+int    has_heredoc(t_command *cmd);
+void    heredoc_sigint_handler(int signo);
 
 #endif

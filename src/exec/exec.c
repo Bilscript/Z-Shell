@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
+/*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 13:38:30 by bhamani           #+#    #+#             */
-/*   Updated: 2025/04/27 13:38:47 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/04/29 00:10:27 by slebik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ int	is_builtin(char *cmd)
 
 void	exec_builtin(t_command *cmd, t_envp_list *env_data)
 {
+	prepare_heredocs(cmd);
 	if (!ft_strcmp(cmd->cmd, "echo"))
 		ft_echo(cmd);
 	else if (!ft_strcmp(cmd->cmd, "cd"))
@@ -43,28 +44,61 @@ void	exec_builtin(t_command *cmd, t_envp_list *env_data)
 		//ft_exit(cmd);
 }
 
-static void	exec_builtin_or_real(t_command *cmd, t_envp_list *env_data)
+void exec_builtin_or_real(t_command *cmd, t_envp_list *env_data)
 {
-	if (ft_strcmp(cmd->cmd, "echo") == 0)
-		ft_echo(cmd);
-	else if (ft_strcmp(cmd->cmd, "cd") == 0)
-		ft_cd(cmd);
-	else if (ft_strcmp(cmd->cmd, "pwd") == 0)
-		ft_pwd();
-	else if (ft_strcmp(cmd->cmd, "export") == 0)
-		ft_export(cmd, env_data->head);
-	else if (ft_strcmp(cmd->cmd, "unset") == 0)
-		ft_unset(cmd, env_data->head);
-	else if (ft_strcmp(cmd->cmd, "env") == 0)
-		ft_env(cmd, env_data->head);
-	//	else if (ft_strcmp(cmd->cmd, "exit") == 0)
-	//	ft_exit(cmd);
-	else
-	{
-		run_command(cmd, env_data);
-		// free tard plus
-		//getenv("");
-	}
+    pid_t			pid;
+    int				status;
+    t_stdio_backup	backup;
+
+    prepare_heredocs(cmd);
+    if (is_builtin(cmd->cmd) && !has_heredoc(cmd))
+    {
+        save_stdio(&backup);
+        handle_redirections(cmd);
+        exec_builtin(cmd, env_data);
+        restore_stdio(&backup);
+    }
+    else
+    {
+        pid = fork();
+        if (pid == 0)
+        {
+            handle_redirections(cmd);
+            if (is_builtin(cmd->cmd))
+                exec_builtin(cmd, env_data);
+            else
+                run_command(cmd, env_data);
+            exit(EXIT_SUCCESS);
+        }
+        else if (pid < 0)
+            error("fork failed");
+        waitpid(pid, &status, 0);
+    }
+}
+
+void save_stdio(t_stdio_backup *backup)
+{
+    backup->stdin_copy = dup(STDIN_FILENO);
+    if (backup->stdin_copy == -1)
+        perror("dup stdin");
+
+    backup->stdout_copy = dup(STDOUT_FILENO);
+    if (backup->stdout_copy == -1)
+        perror("dup stdout");
+}
+
+void restore_stdio(t_stdio_backup *backup)
+{
+    if (backup->stdin_copy != -1)
+    {
+        dup2(backup->stdin_copy, STDIN_FILENO);
+        close(backup->stdin_copy);
+    }
+    if (backup->stdout_copy != -1)
+    {
+        dup2(backup->stdout_copy, STDOUT_FILENO);
+        close(backup->stdout_copy);
+    }
 }
 
 void	exec(t_command *cmd_line, t_envp_list *env_data, t_token *token)
