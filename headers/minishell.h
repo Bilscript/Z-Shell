@@ -105,8 +105,9 @@ t_quote_status	ft_lasttoken_status(t_token *lst);
 void			add_token(t_token **src, t_token *dest);
 void			token_dollar(t_parse_ctx *ctx, t_token **tkn, t_envp *envp,
 					t_quote_status sta);
-void			token_word(char *input, size_t *i,
-					t_token **tokens, t_envp *envp);
+int				token_word(char *input, size_t *i, t_token **tokens,
+					t_envp *envp);
+
 void			free_tokens(t_token *list);
 void			print_tokens(t_token *list);
 int				ft_isspace(char c);
@@ -126,6 +127,7 @@ void			add_arg(t_command *cmd, const char *word);
 void			add_redir(t_command *cmd, t_redir *redir);
 void			print_commands(t_command *cmd_list);
 void			free_command(t_command *cmd);
+void			token_dollar_inside_word(t_parse_ctx *ctx, t_envp *envp);
 
 //================BUILT-IN UTILS================
 void			exec(t_command *cmd_line, t_envp_list *envp, t_token *token);
@@ -183,8 +185,8 @@ void			handle_redir_in(char *input, size_t *i, t_token **tokens);
 void			accolade_gestion(char *input, size_t *i, char **tmp);
 void			get_pid_var(char **value, size_t *i, t_token **tkn,
 					t_quote_status q_st);
-void			handle_single_quote(t_parse_ctx *ctx);
-void			handle_double_quote(t_parse_ctx *ctx, t_envp *envp);
+int				handle_single_quote(t_parse_ctx *ctx);
+int				handle_double_quote(t_parse_ctx *ctx, t_envp *envp);
 void			handle_variable(t_parse_ctx *ctx, t_envp *envp);
 t_parse_ctx		init_parse_ctx(char *input, size_t *i, char *buf, size_t *len);
 int				has_pipe(t_token *tokens);

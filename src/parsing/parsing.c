@@ -23,7 +23,43 @@ char	*get_value(t_envp *envp, char *key)
 	return (NULL);
 }
 
-void	token_word(char *input, size_t *i, t_token **tokens, t_envp *envp)
+void	append_to_buf(t_parse_ctx *ctx, const char *str, size_t len)
+{
+	size_t	i;
+
+	i = 0;
+	while (i < len)
+		ctx->buf[(*ctx->len)++] = str[i++];
+}
+
+void	token_dollar_inside_word(t_parse_ctx *ctx, t_envp *envp)
+{
+	size_t	start;
+	char	*key;
+	char	*val;
+
+	start = ++(*ctx->i);
+	if (!ctx->input[*ctx->i] || !(ft_isalnum(ctx->input[*ctx->i])
+			|| ctx->input[*ctx->i] == '_'))
+	{
+		ctx->buf[(*ctx->len)++] = '$';
+		return ;
+	}
+	while (ctx->input[*ctx->i] && (ft_isalnum(ctx->input[*ctx->i])
+			|| ctx->input[*ctx->i] == '_'))
+		(*ctx->i)++;
+	key = strndup(ctx->input + start, *ctx->i - start);
+	if (!key)
+		return ;
+	val = get_value(envp, key);
+	free(key);
+	if (!val)
+		return ;
+	while (*val)
+		ctx->buf[(*ctx->len)++] = *val++;
+}
+
+int	token_word(char *input, size_t *i, t_token **tokens, t_envp *envp)
 {
 	char		*buf;
 	size_t		len;
@@ -31,68 +67,32 @@ void	token_word(char *input, size_t *i, t_token **tokens, t_envp *envp)
 
 	buf = malloc(strlen(input + *i) + 1);
 	if (!buf)
-		return ;
+		return (0);
 	len = 0;
 	ctx = init_parse_ctx(input, i, buf, &len);
-	while (input[*i] && !ft_isspace(input[*i])
-		&& input[*i] != '|' && input[*i] != '<' && input[*i] != '>')
+	while (input[*i] && !ft_isspace(input[*i]) && input[*i] != '|'
+		&& input[*i] != '<' && input[*i] != '>')
 	{
 		if (input[*i] == '"')
-			handle_double_quote(&ctx, envp);
+		{
+			if (!handle_double_quote(&ctx, envp))
+				return (free(buf), 0);
+		}
 		else if (input[*i] == '\'')
-			handle_single_quote(&ctx);
+		{
+			if (!handle_single_quote(&ctx))
+				return (free(buf), 0);
+		}
 		else if (input[*i] == '$')
-			token_dollar(&ctx, tokens, envp, QUOTE_NONE);
+			token_dollar_inside_word(&ctx, envp);
 		else
-			buf[len++] = input[(*i)++];
+			ctx.buf[(*ctx.len)++] = input[(*ctx.i)++];
 	}
-	buf[len] = '\0';
-	add_token(tokens, new_token(TOKEN_WORD, buf, len, QUOTE_NONE));
+	ctx.buf[*ctx.len] = '\0';
+	add_token(tokens, new_token(TOKEN_WORD, ctx.buf, *ctx.len, QUOTE_NONE));
 	free(buf);
+	return (1);
 }
-
-void	token_dollar(t_parse_ctx *ctx, t_token **tkn, t_envp *envp, t_quote_status sta)
-{
-	size_t	start;
-	char	*var_name;
-	char	*value;
-
-	start = *ctx->i;
-	(*ctx->i)++;
-	if (ctx->input[*ctx->i] == '$')
-	{
-		get_pid_var(&value, ctx->i, tkn, sta);
-		return ;
-	}
-	if (ctx->input[*ctx->i] == '{')
-	{
-		accolade_gestion(ctx->input, ctx->i, &var_name);
-	}
-	else if (ctx->input[*ctx->i] && (ft_isalpha(ctx->input[*ctx->i]) || ctx->input[*ctx->i] == '_'))
-	{
-		while (ctx->input[*ctx->i] && (ft_isalnum(ctx->input[*ctx->i]) || ctx->input[*ctx->i] == '_'))
-			(*ctx->i)++;
-		var_name = strndup(&ctx->input[start + 1], *ctx->i - start - 1);
-	}
-	else
-	{
-		while (ctx->input[*ctx->i] && !ft_isspace(ctx->input[*ctx->i])
-			&& ctx->input[*ctx->i] != '|' && ctx->input[*ctx->i] != '<' && ctx->input[*ctx->i] != '>')
-			(*ctx->i)++;
-		var_name = strndup(&ctx->input[start], *ctx->i - start);
-		add_token(tkn, new_token(TOKEN_WORD, var_name, ft_strlen(var_name), sta));
-		free(var_name);
-		return ;
-	}
-	if (var_name)
-	{
-		value = get_value(envp, var_name);
-		free(var_name);
-		if (value)
-			add_token(tkn, new_token(TOKEN_WORD, value, ft_strlen(value), sta));
-	}
-}
-
 
 void	tokenize_special(char *input, size_t *i, t_token **tokens)
 {
@@ -111,24 +111,20 @@ t_token	*tokenizer(char *input, t_envp *envp)
 {
 	size_t		i;
 	t_token		*tokens;
-	t_parse_ctx	ctx;
 
 	tokens = NULL;
 	i = 0;
-	ctx.input = input;
-	ctx.i = &i;
-	ctx.buf = NULL;
-	ctx.len = NULL;
 	while (input[i])
 	{
 		if (ft_isspace(input[i]))
 			i++;
-		else if (input[i] == '$')
-			token_dollar(&ctx, &tokens, envp, QUOTE_NONE);
 		else if (input[i] == '|' || input[i] == '<' || input[i] == '>')
 			tokenize_special(input, &i, &tokens);
 		else
-			token_word(input, &i, &tokens, envp);
+		{
+			if (!token_word(input, &i, &tokens, envp))
+				return (NULL);
+		}
 	}
 	add_token(&tokens, new_token(TOKEN_EOF, NULL, 0, QUOTE_NONE));
 	return (tokens);
