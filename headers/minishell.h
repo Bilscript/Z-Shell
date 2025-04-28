@@ -19,7 +19,7 @@
 # include <signal.h>
 # include <readline/readline.h>
 # include <readline/history.h>
-# include "../libft/libft.h"
+# include "libft.h"
 # include "linux/limits.h"
 # include <stdbool.h>
 # include <string.h>
@@ -161,7 +161,7 @@ int				is_builtin(char *cmd);
 
 char			*ft_strjoin_char(char *str, char c);
 int				get_next_line(char **line);
-
+int				is_valid(const char *str);
 void			here_doc_child(int *fd, char *limiter);
 void			here_doc_parent(int *fd);
 int				handle_here_doc(char *limiter);

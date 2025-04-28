@@ -53,7 +53,7 @@ void	parse_and_execute(char *input, t_envp_list *env_data)
 	token = tokenizer(input, env_data->head);
 	//print_tokens(token);
 	command = lexer(token);
-	//print_commands(command);
+	print_commands(command);
 	exec(command, env_data, token);
 	free_tab(env_data->lenv);
 	env_data->lenv = envp_to_array(env_data->head);

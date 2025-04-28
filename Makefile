@@ -46,37 +46,31 @@ SRC     = \
 
 OBJ     = $(SRC:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 
-# Libft
-LIBFT_DIR = libft
-LIBFT = $(LIBFT_DIR)/libft.a
+INCLUDES = ./headers
 
-# Includes
-INC     = -Isrc -I$(LIBFT_DIR)
+# Libft
+LIBFT_DIR = ./libft
+LIBFT = $(LIBFT_DIR)/libft.a
 
 # Libraries
 LIBS    = -lreadline
 
 # Rules
 
-all: $(LIBFT) $(NAME)
+all: $(NAME)
 
 $(NAME): $(OBJ)
-	$(CC) $(CFLAGS) $(OBJ) $(LIBFT) $(LIBS) -o $(NAME)
-
-$(LIBFT):
-	$(MAKE) -C $(LIBFT_DIR)
+	$(CC) $(CFLAGS) $(OBJ) $(LIBFT) -I$(INCLUDES) $(LIBS) -o $(NAME)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) $(INC) -c $< -o $@
+	$(CC) $(CFLAGS) -I$(INCLUDES) -c $< -o $@
 
 clean:
 	rm -rf $(OBJ_DIR)
-	$(MAKE) clean -C $(LIBFT_DIR)
 
 fclean: clean
 	rm -f $(NAME)
-	$(MAKE) fclean -C $(LIBFT_DIR)
 
 re: fclean all
 

@@ -6,7 +6,7 @@
 /*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 14:12:19 by bhamani           #+#    #+#             */
-/*   Updated: 2025/04/27 17:59:57 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/04/28 13:40:36 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ static void	print_env(t_envp *envp)
 	return ;
 }
 
-static int	is_valid(const char *str)
+int	is_valid(const char *str)
 {
 	int	i;
 

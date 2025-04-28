@@ -1,5 +1,16 @@
 {
 	"files.associations": {
-		"minishell.h": "c"
+		"minishell.h": "c",
+		"limits.h": "c",
+		"history.h": "c",
+		"libft.h": "c",
+		"cmath": "c",
+		"compare": "c",
+		"concepts": "c",
+		"exception": "c",
+		"type_traits": "c",
+		"limits": "c",
+		"new": "c",
+		"typeinfo": "c"
 	}
 }

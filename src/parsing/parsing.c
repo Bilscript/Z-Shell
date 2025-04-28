@@ -42,7 +42,7 @@ void	token_word(char *input, size_t *i, t_token **tokens, t_envp *envp)
 		else if (input[*i] == '\'')
 			handle_single_quote(&ctx);
 		else if (input[*i] == '$')
-			handle_variable(&ctx, envp);
+			token_dollar(&ctx, tokens, envp, QUOTE_NONE);
 		else
 			buf[len++] = input[(*i)++];
 	}
@@ -51,11 +51,10 @@ void	token_word(char *input, size_t *i, t_token **tokens, t_envp *envp)
 	free(buf);
 }
 
-void	token_dollar(t_parse_ctx *ctx, t_token **tkn, t_envp *envp,
-					t_quote_status sta)
+void	token_dollar(t_parse_ctx *ctx, t_token **tkn, t_envp *envp, t_quote_status sta)
 {
 	size_t	start;
-	char	*tmp;
+	char	*var_name;
 	char	*value;
 
 	start = *ctx->i;
@@ -66,29 +65,34 @@ void	token_dollar(t_parse_ctx *ctx, t_token **tkn, t_envp *envp,
 		return ;
 	}
 	if (ctx->input[*ctx->i] == '{')
-		accolade_gestion(ctx->input, ctx->i, &tmp);
-	else if (!ctx->input[*ctx->i] || ft_isspace(ctx->input[*ctx->i])
-		|| ctx->input[*ctx->i] == '|' || ctx->input[*ctx->i] == '<'
-		|| ctx->input[*ctx->i] == '>')
 	{
-		add_token(tkn, new_token(TOKEN_WORD, "$", 1, sta));
-		return ;
+		accolade_gestion(ctx->input, ctx->i, &var_name);
+	}
+	else if (ctx->input[*ctx->i] && (ft_isalpha(ctx->input[*ctx->i]) || ctx->input[*ctx->i] == '_'))
+	{
+		while (ctx->input[*ctx->i] && (ft_isalnum(ctx->input[*ctx->i]) || ctx->input[*ctx->i] == '_'))
+			(*ctx->i)++;
+		var_name = strndup(&ctx->input[start + 1], *ctx->i - start - 1);
 	}
 	else
 	{
-		while (ctx->input[*ctx->i] && (ft_isalnum(ctx->input[*ctx->i])
-				|| ctx->input[*ctx->i] == '_'))
+		while (ctx->input[*ctx->i] && !ft_isspace(ctx->input[*ctx->i])
+			&& ctx->input[*ctx->i] != '|' && ctx->input[*ctx->i] != '<' && ctx->input[*ctx->i] != '>')
 			(*ctx->i)++;
-		tmp = strndup(&ctx->input[start + 1], *ctx->i - start - 1);
+		var_name = strndup(&ctx->input[start], *ctx->i - start);
+		add_token(tkn, new_token(TOKEN_WORD, var_name, ft_strlen(var_name), sta));
+		free(var_name);
+		return ;
 	}
-	if (tmp)
+	if (var_name)
 	{
-		value = get_value(envp, tmp);
-		free(tmp);
+		value = get_value(envp, var_name);
+		free(var_name);
 		if (value)
 			add_token(tkn, new_token(TOKEN_WORD, value, ft_strlen(value), sta));
 	}
 }
+
 
 void	tokenize_special(char *input, size_t *i, t_token **tokens)
 {

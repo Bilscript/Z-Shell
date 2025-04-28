@@ -107,6 +107,7 @@ void	exec_piped_commands(t_command *cmd, t_envp_list *env_data)
 
 	in_fd = 0;
 	prepare_heredocs(cmd);
+	printf("envie de mourir menu\n");
 	current = cmd;
 	while (current)
 	{
