@@ -20,8 +20,8 @@
 # include <readline/readline.h>
 # include <readline/history.h>
 # include "libft.h"
-//# include "linux/limits.h"
-# include "limits.h" // jsui sur mac
+# include "linux/limits.h"
+//# include "limits.h"
 # include <stdbool.h>
 # include <string.h>
 # include <fcntl.h>
