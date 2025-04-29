@@ -48,18 +48,17 @@ void	token_dollar_inside_word(t_parse_ctx *ctx, t_envp *envp)
 	while (ctx->input[*ctx->i] && (ft_isalnum(ctx->input[*ctx->i])
 			|| ctx->input[*ctx->i] == '_'))
 		(*ctx->i)++;
-	key = strndup(ctx->input + start, *ctx->i - start);
+	key = ft_strndup(ctx->input + start, *ctx->i - start);
 	if (!key)
 		return ;
 	val = get_value(envp, key);
 	free(key);
 	if (!val)
 		return ;
-	while (*val)
-		ctx->buf[(*ctx->len)++] = *val++;
+	append_to_buf(ctx, val, ft_strlen(val));
 }
 
-int	token_word(char *input, size_t *i, t_token **tokens, t_envp *envp)
+int	 token_word(char *input, size_t *i, t_token **tokens, t_envp *envp)
 {
 	char		*buf;
 	size_t		len;

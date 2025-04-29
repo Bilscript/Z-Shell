@@ -66,7 +66,7 @@ int main(int ac, char **av, char **envp)
 	char		*input;
 	t_envp_list	env_data;
 
-	print_shell();
+//	print_shell();
 	(void)ac;
 	(void)av;
 	signal(SIGINT, handle_sigint);
