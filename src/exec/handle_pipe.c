@@ -21,17 +21,31 @@ void	write_to_pipe(int fd, char *line)
 
 void prepare_child(t_command *current, int in_fd, int *fd)
 {
-    int				null_fd;
-    t_stdio_backup	backup;
+    int null_fd;
+    t_redir *redir;
 
-    save_stdio(&backup);
-    if (in_fd != 0)
+    // HEREDOC prioritaire
+    redir = current->redirs;
+    while (redir)
+    {
+        if (redir->type == TOKEN_HEREDOC)
+        {
+            dup2(redir->heredoc_fd, STDIN_FILENO);
+            close(redir->heredoc_fd);
+            break;
+        }
+        redir = redir->next;
+    }
+
+    // Si pas de heredoc, utilise in_fd (pipe précédent)
+    if (!redir && in_fd != 0)
     {
         dup2(in_fd, STDIN_FILENO);
         close(in_fd);
     }
-    else if (ft_strcmp(current->cmd, "cat") == 0
-             && !current->args[1] && current->next)
+
+    // Si cat sans fichier et avec pipe : éviter blocage
+    else if (!redir && ft_strcmp(current->cmd, "cat") == 0 && !current->args[1] && current->next)
     {
         null_fd = open("/dev/null", O_RDONLY);
         if (null_fd != -1)
@@ -40,16 +54,18 @@ void prepare_child(t_command *current, int in_fd, int *fd)
             close(null_fd);
         }
     }
+
     if (current->next)
     {
         close(fd[0]);
         dup2(fd[1], STDOUT_FILENO);
         close(fd[1]);
     }
+
     handle_redirections(current);
-    // Si besoin de restaurer plus tard dans le parent
-    restore_stdio(&backup);
 }
+
+
 
 void	exec_command_children(t_command *current, t_envp_list *env_data, int fd)
 {
@@ -77,7 +93,70 @@ void	exec_command_children(t_command *current, t_envp_list *env_data, int fd)
 	exit(1);
 }
 
-// Gestion du parent après fork
+/* // Gestion du parent après fork
+void prepare_child(t_command *current, int in_fd, int *fd)
+{
+    int null_fd;
+    t_redir *redir;
+
+    if (in_fd != 0)
+    {
+        dup2(in_fd, STDIN_FILENO);
+        close(in_fd);
+    }
+
+    if (current->next)
+    {
+        close(fd[0]);
+        dup2(fd[1], STDOUT_FILENO);
+        close(fd[1]);
+    }
+
+    redir = current->redirs;
+    while (redir)
+    {
+        if (redir->type == TOKEN_HEREDOC)
+        {
+            int pipe_fd[2];
+            if (pipe(pipe_fd) == -1)
+                error("pipe failed");
+            pid_t pid = fork();
+            if (pid == 0)
+            {
+                // fils qui lit l'entrée du heredoc
+                close(pipe_fd[0]);
+                char *line;
+                while (1)
+                {
+                    write(1, "> ", 2);
+                    if (get_next_line(&line) <= 0)
+                        break;
+                    if (ft_strcmp(line, redir->filename) == 0)
+                    {
+                        free(line);
+                        break;
+                    }
+                    write(pipe_fd[1], line, ft_strlen(line));
+                    write(pipe_fd[1], "\n", 1);
+                    free(line);
+                }
+                close(pipe_fd[1]);
+                exit(0);
+            }
+            else
+            {
+                close(pipe_fd[1]);
+                waitpid(pid, NULL, 0);
+                dup2(pipe_fd[0], STDIN_FILENO);
+                close(pipe_fd[0]);
+            }
+        }
+        redir = redir->next;
+    }
+
+    handle_redirections(current);
+} */
+
 void	handle_parent(t_command *current, int *in_fd, int *fd)
 {
 	t_redir	*redir;

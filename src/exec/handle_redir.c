@@ -77,7 +77,11 @@ void	handle_redirections(t_command *cmd)
 		else if (redir->type == TOKEN_APPEND)
 			handle_append_redir(redir);
 		else if (redir->type == TOKEN_HEREDOC)
-			handle_heredoc_redir(redir);
+		{
+			dup2(redir->heredoc_fd, STDIN_FILENO);
+			close(redir->heredoc_fd);
+			// handle_heredoc_redir(redir);
+		}
 		redir = redir->next;
 	}
 }

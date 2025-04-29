@@ -12,6 +12,18 @@
 
 #include "minishell.h"
 
+int	process_heredoc(t_redir *redir)
+{
+	int	fd;
+
+	fd = handle_here_doc(redir->filename); // ici, filename contient le limiter
+	if (fd == -1)
+		return (0); // SIGINT reçu, interruption
+	redir->heredoc_fd = fd;
+	return (1);
+}
+
+
 int    has_heredoc(t_command *cmd)
 {
     t_redir *redir = cmd->redirs;
@@ -24,13 +36,11 @@ int    has_heredoc(t_command *cmd)
     return 0;
 }
 
-void	prepare_heredocs(t_command *cmd)
+int	prepare_heredocs(t_command *cmd)
 {
-	t_command	*current;
+	t_command	*current = cmd;
 	t_redir		*redir;
-	int			heredoc_fd;
 
-	current = cmd;
 	while (current)
 	{
 		redir = current->redirs;
@@ -38,18 +48,14 @@ void	prepare_heredocs(t_command *cmd)
 		{
 			if (redir->type == TOKEN_HEREDOC)
 			{
-				heredoc_fd = handle_here_doc(redir->filename);
-				if (heredoc_fd == -1)
-				{
-					write(2, "Heredoc interrupted\n", 21);
-					exit(130); 
-				}
-				redir->heredoc_fd = heredoc_fd;
+				if (!process_heredoc(redir))
+					return (0); // interruption (ex: CTRL+C)
 			}
 			redir = redir->next;
 		}
 		current = current->next;
 	}
+	return (1);
 }
 
 void    heredoc_sigint_handler(int signo)

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
+/*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 13:38:30 by bhamani           #+#    #+#             */
-/*   Updated: 2025/04/29 12:08:31 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/04/29 15:09:37 by slebik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,8 @@ void exec_builtin_or_real(t_command *cmd, t_envp_list *env_data)
     int				status;
     t_stdio_backup	backup;
 
-    prepare_heredocs(cmd);
+	if (!prepare_heredocs(cmd))
+		return ;
     if (is_builtin(cmd->cmd) && !has_heredoc(cmd))
     {
         save_stdio(&backup);
@@ -135,19 +136,16 @@ void	run_command(t_command *cmd, t_envp_list *env_data)
 	if (pid < 0)
 	{
 		perror("fork failed");
-		free(path);
+		printf("free path\n");
 		return ;
 	}
 	if (pid == 0)
 	{
 		execve(path, cmd->args, env_data->lenv);
 		perror("execve failed");
-		free(path);
 		exit(EXIT_FAILURE);
 	}
 	else
-	{
 		waitpid(pid, &status, 0);
-		free(path);
-	}
+	free(path);
 }
