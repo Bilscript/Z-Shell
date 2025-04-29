@@ -52,25 +52,35 @@ INCLUDES = ./headers
 LIBFT_DIR = ./libft
 LIBFT = $(LIBFT_DIR)/libft.a
 
-# Libraries
+# Configuration pour Mac ARM64
+READLINE_DIR = /opt/homebrew/opt/readline
+ARCH_FLAGS = -arch arm64
+
+CFLAGS  = -Wall -Wextra -Werror $(ARCH_FLAGS) -I$(READLINE_DIR)/include -I./headers
+LDFLAGS = -L$(READLINE_DIR)/lib $(ARCH_FLAGS)
 LIBS    = -lreadline
 
-# Rules
+# Compilation rules
 
 all: $(NAME)
 
-$(NAME): $(OBJ)
-	$(CC) $(CFLAGS) $(OBJ) $(LIBFT) -I$(INCLUDES) $(LIBS) -o $(NAME)
+$(NAME): $(LIBFT) $(OBJ)
+	$(CC) $(CFLAGS) $(OBJ) $(LIBFT) $(LDFLAGS) $(LIBS) -o $(NAME)
+
+$(LIBFT):
+	@make -C $(LIBFT_DIR) CFLAGS="$(ARCH_FLAGS)"
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -I$(INCLUDES) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
 	rm -rf $(OBJ_DIR)
+	@make -C $(LIBFT_DIR) clean
 
 fclean: clean
 	rm -f $(NAME)
+	@make -C $(LIBFT_DIR) fclean
 
 re: fclean all
 

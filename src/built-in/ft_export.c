@@ -6,7 +6,7 @@
 /*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 14:12:19 by bhamani           #+#    #+#             */
-/*   Updated: 2025/04/28 13:40:36 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/04/29 12:25:06 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,18 +14,25 @@
 
 int	set_key(t_envp *envp, char *key, char *value)
 {
+	int		len;
+
 	while (envp)
 	{
 		if (ft_strcmp(envp->key, key) == 0)
 		{
 			free(envp->value);
-			envp->value = ft_strdup(value + len_until_char(value, '=') + 1);
+			len = len_until_char(value, '=');
+			if (len == -1)
+				envp->value = ft_strdup("");
+			else
+				envp->value = ft_strdup(value + len + 1);
 			return (1);
 		}
 		envp = envp->next;
 	}
 	return (0);
 }
+
 
 static void	print_env(t_envp *envp)
 {
@@ -64,19 +71,19 @@ static void	handle_export_arg(t_envp **envp, const char *arg)
 
 	len = len_until_char(arg, '=');
 	key = ft_strndup(arg, len);
+	if (!key)
+		return ;
 	if (ft_strchr(arg, '='))
 	{
 		if (!set_key(*envp, key, (char *)arg))
 			add_envp_back(envp, new_envp(key, (char *)arg + len + 1, true));
-		else
-			free(key);
+		free(key);
 	}
 	else
 	{
 		if (!set_key(*envp, key, ""))
 			add_envp_back(envp, new_envp(key, "", true));
-		else
-			free(key);
+		free(key);
 	}
 }
 

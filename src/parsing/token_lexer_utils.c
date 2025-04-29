@@ -6,7 +6,7 @@
 /*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/17 16:18:26 by bhamani           #+#    #+#             */
-/*   Updated: 2025/04/27 11:48:33 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/04/29 12:04:07 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ t_redir	*new_redir(int type, const char *filename)
 	if (!redir)
 		return (NULL);
 	redir->type = type;
-	redir->filename = strdup(filename);
+	redir->filename = ft_strdup(filename);
 	redir->next = NULL;
 	return (redir);
 }
@@ -86,7 +86,7 @@ void	add_arg(t_command *cmd, const char *word)
 	new_args = copy_args(cmd->args, i);
 	if (!new_args)
 		return ;
-	new_args[i] = strdup(word);
+	new_args[i] = ft_strdup(word);
 	new_args[i + 1] = NULL;
 	free(cmd->args);
 	cmd->args = new_args;

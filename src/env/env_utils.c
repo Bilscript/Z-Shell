@@ -6,7 +6,7 @@
 /*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 17:21:26 by bhamani           #+#    #+#             */
-/*   Updated: 2025/04/27 11:31:42 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/04/29 12:08:31 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,8 +50,19 @@ t_envp	*new_envp(const char *key, const char *value, bool exprt)
 	node = (t_envp *)malloc(sizeof(t_envp));
 	if (!node)
 		return (NULL);
-	node->key = strdup(key);
-	node->value = strdup(value);
+	node->key = ft_strdup(key);
+	if (!node->key)
+	{
+		free(node);
+		return (NULL);
+	}
+	node->value = ft_strdup(value);
+	if (!node->value)
+	{
+		free(node->key);
+		free(node);
+		return (NULL);
+	}
 	node->export = exprt;
 	node->next = NULL;
 	return (node);
@@ -79,6 +90,8 @@ t_envp	*get_env(char **env)
 	int		i;
 	int		len;
 	t_envp	*res;
+	char	*key;
+	char	*value;
 
 	i = 0;
 	len = 0;
@@ -86,12 +99,19 @@ t_envp	*get_env(char **env)
 	while (env[i])
 	{
 		len = len_until_char(env[i], '=');
-		add_envp_back(&res,
-			new_envp(
-				ft_strndup(env[i], len),
-				ft_strdup(env[i] + len + 1), false));
+		key = ft_strndup(env[i], len);
+		if (!key)
+			return (res);
+		value = ft_strdup(env[i] + len + 1);
+		if (!value)
+		{
+			free(key);
+			return (res);
+		}
+		add_envp_back(&res, new_envp(key, value, false));
+		free(key);
+		free(value);
 		i++;
-		//printf("new env alloc n°%d\n", i);
 	}
 	return (res);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
+/*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 13:38:30 by bhamani           #+#    #+#             */
-/*   Updated: 2025/04/29 00:10:27 by slebik           ###   ########.fr       */
+/*   Updated: 2025/04/29 12:08:31 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,7 +135,6 @@ void	run_command(t_command *cmd, t_envp_list *env_data)
 	if (pid < 0)
 	{
 		perror("fork failed");
-		printf("free path\n");
 		free(path);
 		return ;
 	}
@@ -143,8 +142,12 @@ void	run_command(t_command *cmd, t_envp_list *env_data)
 	{
 		execve(path, cmd->args, env_data->lenv);
 		perror("execve failed");
+		free(path);
 		exit(EXIT_FAILURE);
 	}
 	else
+	{
 		waitpid(pid, &status, 0);
+		free(path);
+	}
 }
