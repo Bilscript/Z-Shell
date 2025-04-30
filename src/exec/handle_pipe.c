@@ -61,8 +61,8 @@ void prepare_child(t_command *current, int in_fd, int *fd)
         dup2(fd[1], STDOUT_FILENO);
         close(fd[1]);
     }
-
-    handle_redirections(current);
+	if (handle_redirections(current) == -1)
+		exit(1);
 }
 
 

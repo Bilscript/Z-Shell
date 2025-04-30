@@ -6,7 +6,7 @@
 /*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 13:38:30 by bhamani           #+#    #+#             */
-/*   Updated: 2025/04/29 15:09:37 by slebik           ###   ########.fr       */
+/*   Updated: 2025/04/30 14:14:46 by slebik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,11 @@ void exec_builtin_or_real(t_command *cmd, t_envp_list *env_data)
     if (is_builtin(cmd->cmd) && !has_heredoc(cmd))
     {
         save_stdio(&backup);
-        handle_redirections(cmd);
+        if (handle_redirections(cmd) == -1)
+		{
+			restore_stdio(&backup);
+			return ;
+		}
         exec_builtin(cmd, env_data);
         restore_stdio(&backup);
     }
@@ -64,7 +68,8 @@ void exec_builtin_or_real(t_command *cmd, t_envp_list *env_data)
         pid = fork();
         if (pid == 0)
         {
-            handle_redirections(cmd);
+            if (handle_redirections(cmd) == -1)
+				exit(1);
             if (is_builtin(cmd->cmd))
                 exec_builtin(cmd, env_data);
             else
@@ -82,7 +87,6 @@ void save_stdio(t_stdio_backup *backup)
     backup->stdin_copy = dup(STDIN_FILENO);
     if (backup->stdin_copy == -1)
         perror("dup stdin");
-
     backup->stdout_copy = dup(STDOUT_FILENO);
     if (backup->stdout_copy == -1)
         perror("dup stdout");
