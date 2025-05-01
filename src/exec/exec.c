@@ -6,7 +6,7 @@
 /*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 13:38:30 by bhamani           #+#    #+#             */
-/*   Updated: 2025/04/30 14:14:46 by slebik           ###   ########.fr       */
+/*   Updated: 2025/05/01 12:59:15 by slebik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,29 +82,7 @@ void exec_builtin_or_real(t_command *cmd, t_envp_list *env_data)
     }
 }
 
-void save_stdio(t_stdio_backup *backup)
-{
-    backup->stdin_copy = dup(STDIN_FILENO);
-    if (backup->stdin_copy == -1)
-        perror("dup stdin");
-    backup->stdout_copy = dup(STDOUT_FILENO);
-    if (backup->stdout_copy == -1)
-        perror("dup stdout");
-}
 
-void restore_stdio(t_stdio_backup *backup)
-{
-    if (backup->stdin_copy != -1)
-    {
-        dup2(backup->stdin_copy, STDIN_FILENO);
-        close(backup->stdin_copy);
-    }
-    if (backup->stdout_copy != -1)
-    {
-        dup2(backup->stdout_copy, STDOUT_FILENO);
-        close(backup->stdout_copy);
-    }
-}
 
 void	exec(t_command *cmd_line, t_envp_list *env_data, t_token *token)
 {

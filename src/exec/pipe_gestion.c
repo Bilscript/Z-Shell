@@ -3,12 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   pipe_gestion.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
+/*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 17:49:19 by slebik            #+#    #+#             */
-/*   Updated: 2025/04/27 12:08:04 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/05/01 11:59:57 by slebik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+// rename le fichier find path
 
 #include "minishell.h"
 
@@ -81,61 +83,3 @@ char	*parsing(t_envp *env_list, char *cmd)
 		return (NULL);
 	return (find_executable(chemins, cmd));
 }
-
-/*
-static char **free_array_and_return_null(char **array, int count)
-{
-	int i;
-
-	i = 0;
-	while (i < count)
-	{
-		free(array[i]);
-		i++;
-	}
-	free(array);
-	return (NULL);
-}
-*/
-/*
-char **env_list_to_array(t_envp *env)
-{
-	int		count;
-	char	**array;
-	t_envp	*cur;
-	char	*tmp;
-
-	count = 0;
-	cur = env;
-	while (cur)
-	{
-		if (cur->export)
-			count++;
-		cur = cur->next;
-	}
-	array = malloc(sizeof(char *) * (count + 1));
-	if (!array)
-		return (NULL);
-	cur = env;
-	count = 0;
-	while (cur)
-	{
-		if (cur->export)
-		{
-			if (!cur->key)
-				return (free_array_and_return_null(array, count));
-			tmp = ft_strjoin(cur->key, "=");
-			if (!tmp)
-				return (free_array_and_return_null(array, count));
-			array[count] = ft_strjoin(tmp, cur->value ? cur->value : "");
-			free(tmp);
-			if (!array[count])
-				return (free_array_and_return_null(array, count));
-			count++;
-		}
-		cur = cur->next;
-	}
-	array[count] = NULL;
-	return (array);
-}
-*/

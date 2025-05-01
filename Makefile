@@ -32,6 +32,7 @@ SRC     = \
 	src/exec/handle_heredoc.c \
 	src/exec/handle_pipe.c \
 	src/exec/handle_redir.c \
+	src/exec/handle_std.c \
 	src/exec/pipe_gestion.c \
 	src/exec/pipe_utils.c \
 	src/parsing/free_function.c \

@@ -181,11 +181,11 @@ void			exec_command_children(t_command *current, t_envp_list *env_data,
 					int in_fd);
 void			prepare_child(t_command *current, int in_fd, int *fd);
 int				prepare_heredocs(t_command *cmd);
-void			handle_input_redir(t_redir *redir);
-void			handle_output_redir(t_redir *redir);
-void			handle_append_redir(t_redir *redir);
-void			handle_heredoc_redir(t_redir *redir);
-void			handle_redirections(t_command *cmd);
+int				handle_input_redir(t_redir *redir);
+int				handle_output_redir(t_redir *redir);
+int				handle_append_redir(t_redir *redir);
+int				handle_heredoc_redir(t_redir *redir);
+int				handle_redirections(t_command *cmd);
 
 void			handle_redir_out(char *input, size_t *i, t_token **tkns);
 void			handle_redir_in(char *input, size_t *i, t_token **tokens);
@@ -200,10 +200,10 @@ int				has_pipe(t_token *tokens);
 void			free_envp_list(t_envp_list *envp_list);
 void			free_tab(char **tab);
 
-void	exec_builtin_or_real(t_command *cmd, t_envp_list *env_data);
-void	save_stdio(t_stdio_backup *backup);
-void	restore_stdio(t_stdio_backup *backup);
-int		has_heredoc(t_command *cmd);
-void    heredoc_sigint_handler(int signo);
+void			exec_builtin_or_real(t_command *cmd, t_envp_list *env_data);
+void			save_stdio(t_stdio_backup *backup);
+void			restore_stdio(t_stdio_backup *backup);
+int				has_heredoc(t_command *cmd);
+void    		heredoc_sigint_handler(int signo);
 
 #endif
