@@ -6,7 +6,7 @@
 /*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 12:29:45 by bhamani           #+#    #+#             */
-/*   Updated: 2025/04/27 17:24:04 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/05/03 14:59:11 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,16 +45,21 @@ void	ft_unset(t_command *cmd, t_envp *envp)
 {
 	t_envp	*temp;
 
-	temp = envp;
 	if (!cmd->args[1])
+	{
+		g_exit_status = EXIT_SUCCESS;
 		return ;
+	}
+	temp = envp;
 	while (temp)
 	{
 		if (ft_strcmp(temp->key, cmd->args[1]) == 0)
 		{
 			remove_key(&envp, temp);
+			g_exit_status = EXIT_SUCCESS;
 			return ;
 		}
 		temp = temp->next;
 	}
+	g_exit_status = EXIT_SUCCESS;
 }

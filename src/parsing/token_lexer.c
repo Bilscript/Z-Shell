@@ -6,7 +6,7 @@
 /*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/17 16:57:58 by bhamani           #+#    #+#             */
-/*   Updated: 2025/04/28 12:52:43 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/05/03 15:47:45 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,25 @@ static	t_token	*process_token(t_token *tok, t_command **cur)
 	return (tok->next);
 }
 
+static bool	is_empty_command(t_command *cmd)
+{
+	return (!cmd->args || !cmd->args[0]);
+}
+
+static bool	check_empty_pipe(t_command *cmds)
+{
+	while (cmds)
+	{
+		if (is_empty_command(cmds))
+		{
+			fprintf(stderr, "Syntax error: empty command\n");
+			return (true);
+		}
+		cmds = cmds->next;
+	}
+	return (false);
+}
+
 t_command	*lexer(t_token *tokens)
 {
 	t_command	*head;
@@ -70,5 +89,11 @@ t_command	*lexer(t_token *tokens)
 			break ;
 		tokens = next;
 	}
+	if (check_empty_pipe(head))
+	{
+		free_command(head);
+		return (NULL);
+	}
 	return (head);
 }
+

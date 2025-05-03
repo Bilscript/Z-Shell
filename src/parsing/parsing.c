@@ -37,7 +37,16 @@ void	token_dollar_inside_word(t_parse_ctx *ctx, t_envp *envp)
 	size_t	start;
 	char	*key;
 	char	*val;
+	char *status_str;
 
+	if (ctx->input[*ctx->i + 1] == '?')
+	{
+		status_str = ft_itoa(g_exit_status);
+		append_to_buf(ctx, status_str, ft_strlen(status_str));
+		free(status_str);
+		(*ctx->i) += 2;
+		return ;
+	}
 	start = ++(*ctx->i);
 	if (!ctx->input[*ctx->i] || !(ft_isalnum(ctx->input[*ctx->i])
 			|| ctx->input[*ctx->i] == '_'))
@@ -57,6 +66,7 @@ void	token_dollar_inside_word(t_parse_ctx *ctx, t_envp *envp)
 		return ;
 	append_to_buf(ctx, val, ft_strlen(val));
 }
+
 
 int	token_word(char *input, size_t *i, t_token **tokens, t_envp *envp)
 {

@@ -6,7 +6,7 @@
 /*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 14:12:19 by bhamani           #+#    #+#             */
-/*   Updated: 2025/05/03 13:48:17 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/05/03 14:53:15 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,10 +88,14 @@ static void	handle_export_arg(t_envp **envp, const char *arg)
 
 void	ft_export(t_command *cmd, t_envp *envp)
 {
-	int		i;
+	int	i;
 
 	if (!cmd->args[1])
-		return (print_env(envp));
+	{
+		print_env(envp);
+		g_exit_status = EXIT_SUCCESS;
+		return ;
+	}
 	i = 1;
 	while (cmd->args[i])
 	{
@@ -100,6 +104,7 @@ void	ft_export(t_command *cmd, t_envp *envp)
 			write(2, "bash: export: `", 15);
 			write(2, cmd->args[i], strlen(cmd->args[i]));
 			write(2, "': not a valid identifier\n", 26);
+			g_exit_status = EXIT_BUILTIN_ERROR;
 		}
 		else
 			handle_export_arg(&envp, cmd->args[i]);

@@ -6,37 +6,42 @@
 /*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 11:26:24 by bhamani           #+#    #+#             */
-/*   Updated: 2025/04/27 11:26:52 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/05/03 14:39:27 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	ft_cd(t_command *cmd_line)
+static void	print_cd_error(char *msg, char *arg, int code)
+{
+	ft_putstr_fd("cd: ", 2);
+	if (arg)
+	{
+		ft_putstr_fd(arg, 2);
+		ft_putstr_fd(": ", 2);
+	}
+	if (msg)
+		ft_putstr_fd(msg, 2);
+	ft_putstr_fd("\n", 2);
+	g_exit_status = code;
+}
+
+
+void	ft_cd(t_command *cmd, t_envp *envp)
 {
 	char	*path;
 
-	if (cmd_line->args[2])
-	{
-		printf("cd: too many arguments\n");
-		return ;
-	}
-	if (!cmd_line->args[1])
-	{
-		path = getenv("HOME");
-		if (!path)
-		{
-			write(2, "cd: HOME is not set\n", 21);
-			return ;
-		}
-	}
+	if (cmd->args[1] && cmd->args[2])
+		return (print_cd_error(NULL, "too many arguments", EXIT_GENERAL_ERROR));
+	if (cmd->args[1])
+		path = cmd->args[1];
 	else
-		path = cmd_line->args[1];
-	if (chdir(path) != 0)
+		path = get_value(envp, "HOME");
+	if (!path)
 	{
-		write(2, "cd: ", 4);
-		write(2, path, ft_strlen(path));
-		write(2, ": ", 2);
-		perror("");
+		return (print_cd_error(NULL, "HOME not set", EXIT_GENERAL_ERROR));
 	}
+	if (chdir(path) != 0)
+		return (print_cd_error(path, strerror(errno), EXIT_GENERAL_ERROR));
+	g_exit_status = EXIT_SUCCESS;
 }

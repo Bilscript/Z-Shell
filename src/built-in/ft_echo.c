@@ -6,7 +6,7 @@
 /*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 11:27:40 by bhamani           #+#    #+#             */
-/*   Updated: 2025/04/27 11:27:54 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/05/03 14:48:57 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,4 +49,5 @@ void	ft_echo(t_command *cmd)
 	}
 	if (newline)
 		printf("\n");
+	g_exit_status = EXIT_SUCCESS;
 }

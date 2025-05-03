@@ -6,7 +6,7 @@
 /*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 13:38:30 by bhamani           #+#    #+#             */
-/*   Updated: 2025/05/03 13:41:51 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/05/03 15:08:09 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ void	exec_builtin(t_command *cmd, t_envp_list *env_data)
 	if (!ft_strcmp(cmd->cmd, "echo"))
 		ft_echo(cmd);
 	else if (!ft_strcmp(cmd->cmd, "cd"))
-		ft_cd(cmd);
+		ft_cd(cmd, env_data->head);
 	else if (!ft_strcmp(cmd->cmd, "pwd"))
 		ft_pwd();
 	else if (!ft_strcmp(cmd->cmd, "export"))
@@ -131,6 +131,7 @@ void	run_command(t_command *cmd, t_envp_list *env_data)
 	{
 		ft_putstr_fd(cmd->cmd, 2);
 		ft_putstr_fd(": command not found\n", 2);
+		g_exit_status = 127;
 		return ;
 	}
 	pid = fork();

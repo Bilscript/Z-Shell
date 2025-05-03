@@ -6,7 +6,7 @@
 /*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 11:57:04 by bhamani           #+#    #+#             */
-/*   Updated: 2025/04/28 20:59:08 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/05/03 16:13:49 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,11 +37,14 @@ int	handle_single_quote(t_parse_ctx *ctx)
 	while (ctx->input[*ctx->i] && ctx->input[*ctx->i] != '\'')
 		ctx->buf[(*ctx->len)++] = ctx->input[(*ctx->i)++];
 	if (!ctx->input[*ctx->i])
+	{
+		write(2, "syntax error: unclosed single quote\n", 37);
+		g_exit_status = 2;
 		return (0);
+	}
 	(*ctx->i)++;
 	return (1);
 }
-
 
 int	handle_double_quote(t_parse_ctx *ctx, t_envp *envp)
 {
@@ -54,11 +57,14 @@ int	handle_double_quote(t_parse_ctx *ctx, t_envp *envp)
 			ctx->buf[(*ctx->len)++] = ctx->input[(*ctx->i)++];
 	}
 	if (!ctx->input[*ctx->i])
+	{
+		ft_putstr_fd("syntax error: unclosed double quote\n", 2);
+		g_exit_status = 2;
 		return (0);
+	}
 	(*ctx->i)++;
 	return (1);
 }
-
 
 void	handle_redir_in(char *input, size_t *i, t_token **tokens)
 {

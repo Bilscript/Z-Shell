@@ -6,7 +6,7 @@
 /*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/01 12:49:22 by bhamani           #+#    #+#             */
-/*   Updated: 2025/05/01 14:41:21 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/05/03 14:00:29 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,26 +66,28 @@ int	ft_exit(t_command *cmd)
 	unsigned long long	num;
 	unsigned char		ret;
 
-	write(1, "exit\n", 5);
+	printf("exit\n");
 	if (!cmd->args[1])
-		exit(0);
+		exit(EXIT_SUCCESS);
 	if (!is_numeric(cmd->args[1]))
 	{
 		print_exit_error(cmd->args[1]);
-		exit(2);
+		exit(EXIT_BUILTIN_ERROR);
 	}
 	num = ft_atoull(cmd->args[1]);
 	if ((cmd->args[1][0] != '-' && num > LONG_MAX)
 		|| (cmd->args[1][0] == '-' && num - 1 > LONG_MAX))
 	{
 		print_exit_error(cmd->args[1]);
-		exit(2);
+		exit(EXIT_BUILTIN_ERROR);
 	}
 	if (cmd->args[2])
 	{
 		ft_putstr_fd("bash: exit: too many arguments\n", 2);
+		g_exit_status = EXIT_GENERAL_ERROR;
 		return (1);
 	}
 	ret = (unsigned char)num;
 	exit(ret);
 }
+

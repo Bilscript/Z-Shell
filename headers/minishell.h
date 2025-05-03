@@ -17,6 +17,7 @@
 # include <stdio.h>
 # include <unistd.h>
 # include <signal.h>
+# include <errno.h>
 # include <readline/readline.h>
 # include <readline/history.h>
 # include "libft.h"
@@ -51,6 +52,15 @@ typedef enum e_quote_status
 	QUOTE_SINGLE,
 	QUOTE_DOUBLE
 }	t_quote_status;
+
+typedef enum e_exit_code
+{
+	EXIT_GENERAL_ERROR = 1,
+	EXIT_BUILTIN_ERROR = 2,
+	EXIT_SYNTAX_ERROR = 258,
+	EXIT_SIGNAL_INTERRUPT = 130,
+	EXIT_SIGNAL_QUIT = 131,
+}	t_exit_code;
 
 typedef struct s_redir
 {
@@ -142,7 +152,7 @@ void			token_dollar_inside_word(t_parse_ctx *ctx, t_envp *envp);
 void			exec(t_command *cmd_line, t_envp_list *envp, t_token *token);
 void			ft_echo(t_command *cmd);
 void			ft_pwd(void);
-void			ft_cd(t_command *cmd_line);
+void			ft_cd(t_command *cmd, t_envp *envp);
 void			ft_export(t_command *cmd, t_envp *envp);
 void			ft_unset(t_command *cmd, t_envp *envp);
 int				ft_exit(t_command *cmd);
