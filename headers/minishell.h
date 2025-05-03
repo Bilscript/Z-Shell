@@ -29,6 +29,7 @@
 # include <sys/wait.h>
 
 extern int g_exit_status;
+extern int g_received_signal;
 
 typedef enum e_token_type
 {
@@ -204,6 +205,14 @@ void			exec_builtin_or_real(t_command *cmd, t_envp_list *env_data);
 void			save_stdio(t_stdio_backup *backup);
 void			restore_stdio(t_stdio_backup *backup);
 int				has_heredoc(t_command *cmd);
-void    		heredoc_sigint_handler(int signo);
+
+
+// signalllll
+void	handle_sigint(int signo);
+void	heredoc_sigint_handler(int signo);
+void	setup_signals(void);
+void	setup_exec_signals(void);
+void	setup_heredoc_signals(void);
+void	reset_signals(void);
 
 #endif

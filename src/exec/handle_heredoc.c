@@ -58,18 +58,20 @@ int	prepare_heredocs(t_command *cmd)
 	return (1);
 }
 
-void    heredoc_sigint_handler(int signo)
+void	heredoc_sigint_handler(int signo)
 {
-    (void)signo;
-    write(1, "\n", 1);
-    exit(130);
+	(void)signo;
+	write(1, "\n", 1);
+	close(0);
+	g_exit_status = 130;
+	exit(130);
 }
 
 void	here_doc_child(int *fd, char *limiter)
 {
 	char	*line;
 
-	signal(SIGINT, heredoc_sigint_handler);
+	setup_heredoc_signals();
 	close(fd[0]);
 	while (get_next_line(&line) > 0)
 	{
@@ -93,12 +95,13 @@ void	here_doc_parent(int *fd)
 	close(fd[0]);
 }
 
-int	handle_here_doc(char *limiter) 
+int	handle_here_doc(char *limiter)
 {
 	int		fd[2];
 	pid_t	pid;
 	int		status;
 
+	g_received_signal = 0;
 	if (pipe(fd) == -1)
 		error("pipe error");
 	pid = fork();
@@ -110,8 +113,14 @@ int	handle_here_doc(char *limiter)
 	waitpid(pid, &status, 0);
 	if (WIFSIGNALED(status) && WTERMSIG(status) == SIGINT)
 	{
+		g_received_signal = 1;
+		g_exit_status = 130;
 		close(fd[0]);
-		return (-1); // Retourne une err si le child heredoc a ete tuer par SIGINT
+		return (-1);
 	}
+	g_exit_status = WEXITSTATUS(status);
+	if (g_exit_status == 130)
+		return (-1);
 	return (fd[0]);
 }
+// mtn ca gere un heredoc pour une redirection spécifique et ca retourne le descripteur de fichier ou -1 en cas d'erreur ou d'interruption

@@ -6,7 +6,7 @@
 /*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 13:38:30 by bhamani           #+#    #+#             */
-/*   Updated: 2025/05/01 12:59:15 by slebik           ###   ########.fr       */
+/*   Updated: 2025/05/02 12:44:07 by slebik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,10 @@ void exec_builtin_or_real(t_command *cmd, t_envp_list *env_data)
     t_stdio_backup	backup;
 
 	if (!prepare_heredocs(cmd))
+	{
+		g_exit_status = 130;
 		return ;
+	}
     if (is_builtin(cmd->cmd) && !has_heredoc(cmd))
     {
         save_stdio(&backup);
@@ -63,23 +66,39 @@ void exec_builtin_or_real(t_command *cmd, t_envp_list *env_data)
         exec_builtin(cmd, env_data);
         restore_stdio(&backup);
     }
-    else
-    {
-        pid = fork();
-        if (pid == 0)
-        {
-            if (handle_redirections(cmd) == -1)
+	else
+	{
+		pid = fork();
+		if (pid == 0)
+		{
+			setup_exec_signals();
+			if (handle_redirections(cmd) == -1)
 				exit(1);
-            if (is_builtin(cmd->cmd))
-                exec_builtin(cmd, env_data);
-            else
-                run_command(cmd, env_data);
-            exit(EXIT_SUCCESS);
-        }
-        else if (pid < 0)
-            error("fork failed");
-        waitpid(pid, &status, 0);
-    }
+			if (is_builtin(cmd->cmd))
+				exec_builtin(cmd, env_data);
+			else
+				run_command(cmd, env_data);
+			exit(g_exit_status);
+		}
+		else if (pid < 0)
+			error("fork failed");
+		waitpid(pid, &status, 0);
+		if (WIFSIGNALED(status))
+		{
+			if (WTERMSIG(status) == SIGINT)
+			{
+				g_exit_status = 130;
+				write(1, "\n", 1);
+			}
+			else if (WTERMSIG(status) == SIGQUIT)
+			{
+				g_exit_status = 131;
+				ft_putendl_fd("Quit (core dumped)", 2);
+			}
+		}
+		else
+			g_exit_status = WEXITSTATUS(status);
+	}
 }
 
 

@@ -23,6 +23,7 @@ void prepare_child(t_command *current, int in_fd, int *fd)
 {
     t_redir *redir;
 
+	setup_exec_signals(); // pas sur en mettant la
     redir = current->redirs;  // HEREDOC prioritaire
     while (redir)
     {
@@ -107,7 +108,11 @@ void	exec_piped_commands(t_command *cmd, t_envp_list *env_data)
 	t_command	*current;
 
 	in_fd = 0;
-	prepare_heredocs(cmd);
+	if (!prepare_heredocs(cmd))
+	{
+		g_exit_status = 130;
+		return ;
+	}
 	current = cmd;
 	while (current)
 	{
@@ -121,9 +126,19 @@ void	exec_piped_commands(t_command *cmd, t_envp_list *env_data)
 		}
 		else if (pid < 0)
 			error("fork failed");
-		else
-			handle_parent(current, &in_fd, fd);
+		handle_parent(current, &in_fd, fd);
 		current = current->next;
 	}
-	while (wait(&status) > 0); // interdit a la norme
+	while (wait(&status) > 0) // interdit a la norme
+	{
+		if (WIFSIGNALED(status))
+		{
+			if (WTERMSIG(status) == SIGINT)
+				g_exit_status = 130;
+			else if (WTERMSIG(status) == SIGQUIT)
+				g_exit_status = 131;
+		}
+		else
+			g_exit_status = WEXITSTATUS(status);
+	}
 }
