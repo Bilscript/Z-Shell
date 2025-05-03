@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
+/*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 13:38:30 by bhamani           #+#    #+#             */
-/*   Updated: 2025/05/02 12:44:07 by slebik           ###   ########.fr       */
+/*   Updated: 2025/05/03 13:41:51 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,12 +36,12 @@ void	exec_builtin(t_command *cmd, t_envp_list *env_data)
 		ft_pwd();
 	else if (!ft_strcmp(cmd->cmd, "export"))
 		ft_export(cmd, env_data->head);
-	//else if (!ft_strcmp(cmd->cmd, "unset"))
-		//ft_unset(cmd);
+	else if (!ft_strcmp(cmd->cmd, "unset"))
+		ft_unset(cmd, env_data->head);
 	else if (!ft_strcmp(cmd->cmd, "env"))
 		ft_env(cmd, env_data->head);
-	//else if (!ft_strcmp(cmd->cmd, "exit"))
-		//ft_exit(cmd);
+	else if (!ft_strcmp(cmd->cmd, "exit"))
+		ft_exit(cmd);
 }
 
 void exec_builtin_or_real(t_command *cmd, t_envp_list *env_data)

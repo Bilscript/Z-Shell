@@ -19,33 +19,33 @@ void	write_to_pipe(int fd, char *line)
 	free(line);
 }
 
-void prepare_child(t_command *current, int in_fd, int *fd)
+void	prepare_child(t_command *current, int in_fd, int *fd)
 {
-    t_redir *redir;
+	t_redir	*redir;
 
-	setup_exec_signals(); // pas sur en mettant la
-    redir = current->redirs;  // HEREDOC prioritaire
-    while (redir)
-    {
-        if (redir->type == TOKEN_HEREDOC)
-        {
-            dup2(redir->heredoc_fd, STDIN_FILENO);
-            close(redir->heredoc_fd);
-            break;
-        }
-        redir = redir->next;
-    }
-    if (!redir && in_fd != 0)   // Si pas de heredoc, utilise in_fd du pipe précédent
-    {
-        dup2(in_fd, STDIN_FILENO);
-        close(in_fd);
-    }
-    if (current->next)
-    {
-        close(fd[0]);
-        dup2(fd[1], STDOUT_FILENO);
-        close(fd[1]);
-    }
+	setup_exec_signals();
+	redir = current->redirs;
+	while (redir)
+	{
+		if (redir->type == TOKEN_HEREDOC)
+		{
+			dup2(redir->heredoc_fd, STDIN_FILENO);
+			close(redir->heredoc_fd);
+			break ;
+		}
+		redir = redir->next;
+	}
+	if (!redir && in_fd != 0)
+	{
+		dup2(in_fd, STDIN_FILENO);
+		close(in_fd);
+	}
+	if (current->next)
+	{
+		close(fd[0]);
+		dup2(fd[1], STDOUT_FILENO);
+		close(fd[1]);
+	}
 	if (handle_redirections(current) == -1)
 		exit(1);
 }
@@ -129,7 +129,7 @@ void	exec_piped_commands(t_command *cmd, t_envp_list *env_data)
 		handle_parent(current, &in_fd, fd);
 		current = current->next;
 	}
-	while (wait(&status) > 0) // interdit a la norme
+	while (wait(&status) > 0)
 	{
 		if (WIFSIGNALED(status))
 		{

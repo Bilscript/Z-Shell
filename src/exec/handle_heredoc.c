@@ -16,24 +16,25 @@ int	process_heredoc(t_redir *redir)
 {
 	int	fd;
 
-	fd = handle_here_doc(redir->filename); // ici, filename contient le limiter
+	fd = handle_here_doc(redir->filename);
 	if (fd == -1)
-		return (0); // SIGINT reçu, interruption
+		return (0);
 	redir->heredoc_fd = fd;
 	return (1);
 }
 
-
 int    has_heredoc(t_command *cmd)
 {
-    t_redir *redir = cmd->redirs;
-    while (redir)
-    {
-        if (redir->type == TOKEN_HEREDOC)
-            return 1;
-        redir = redir->next;
-    }
-    return 0;
+	t_redir	*redir;
+
+	redir = cmd->redirs;
+	while (redir)
+	{
+		if (redir->type == TOKEN_HEREDOC)
+			return 1;
+		redir = redir->next;
+	}
+	return 0;
 }
 
 int	prepare_heredocs(t_command *cmd)

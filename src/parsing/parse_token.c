@@ -6,7 +6,7 @@
 /*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 11:50:40 by bhamani           #+#    #+#             */
-/*   Updated: 2025/04/27 11:59:18 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/05/03 13:44:19 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ t_parse_ctx	init_parse_ctx(char *input, size_t *i, char *buf, size_t *len)
 	ctx.i = i;
 	ctx.buf = buf;
 	ctx.len = len;
+	ctx.quote = QUOTE_NONE;
 	return (ctx);
 }
 

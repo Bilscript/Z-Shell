@@ -58,12 +58,14 @@ void	token_dollar_inside_word(t_parse_ctx *ctx, t_envp *envp)
 	append_to_buf(ctx, val, ft_strlen(val));
 }
 
-int	 token_word(char *input, size_t *i, t_token **tokens, t_envp *envp)
+int	token_word(char *input, size_t *i, t_token **tokens, t_envp *envp)
 {
-	char		*buf;
-	size_t		len;
-	t_parse_ctx	ctx;
+	char			*buf;
+	size_t			len;
+	t_parse_ctx		ctx;
+	t_quote_status	quote_status;
 
+	quote_status = QUOTE_NONE;
 	buf = malloc(strlen(input + *i) + 1);
 	if (!buf)
 		return (0);
@@ -74,11 +76,13 @@ int	 token_word(char *input, size_t *i, t_token **tokens, t_envp *envp)
 	{
 		if (input[*i] == '"')
 		{
+			quote_status = QUOTE_DOUBLE;
 			if (!handle_double_quote(&ctx, envp))
 				return (free(buf), 0);
 		}
 		else if (input[*i] == '\'')
 		{
+			quote_status = QUOTE_SINGLE;
 			if (!handle_single_quote(&ctx))
 				return (free(buf), 0);
 		}
@@ -88,8 +92,12 @@ int	 token_word(char *input, size_t *i, t_token **tokens, t_envp *envp)
 			ctx.buf[(*ctx.len)++] = input[(*ctx.i)++];
 	}
 	ctx.buf[*ctx.len] = '\0';
-	add_token(tokens, new_token(TOKEN_WORD, ctx.buf, *ctx.len, QUOTE_NONE));
-	free(buf);
+	if (*ctx.len == 0 && quote_status == QUOTE_NONE)
+	{
+		free(buf);
+		return (1);
+	}
+	add_token(tokens, new_token(TOKEN_WORD, ctx.buf, *ctx.len, quote_status));
 	return (1);
 }
 

@@ -21,7 +21,7 @@
 # include <readline/history.h>
 # include "libft.h"
 # include "linux/limits.h"
-//# include "limits.h"
+# include "limits.h"
 # include <stdbool.h>
 # include <string.h>
 # include <fcntl.h>
@@ -85,9 +85,9 @@ typedef struct s_envp_list
 
 typedef struct s_stdio_backup
 {
-    int stdin_copy;
-    int stdout_copy;
-} t_stdio_backup;
+	int	stdin_copy;
+	int	stdout_copy;
+}	t_stdio_backup;
 
 typedef struct s_token
 {
@@ -99,10 +99,11 @@ typedef struct s_token
 
 typedef struct s_parse_ctx
 {
-	char	*input;
-	size_t	*i;
-	char	*buf;
-	size_t	*len;
+	char			*input;
+	size_t			*i;
+	char			*buf;
+	size_t			*len;
+	t_quote_status	quote;
 }	t_parse_ctx;
 
 //================TOKEN UTILS================
@@ -144,6 +145,7 @@ void			ft_pwd(void);
 void			ft_cd(t_command *cmd_line);
 void			ft_export(t_command *cmd, t_envp *envp);
 void			ft_unset(t_command *cmd, t_envp *envp);
+int				ft_exit(t_command *cmd);
 t_envp			*new_envp(const char *key, const char *value, bool exprt);
 t_envp			*get_env(char **env);
 void			ft_env(t_command *cmd, t_envp *envp);

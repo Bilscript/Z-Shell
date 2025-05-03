@@ -6,7 +6,7 @@
 /*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 14:12:19 by bhamani           #+#    #+#             */
-/*   Updated: 2025/04/29 12:25:06 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/05/03 13:48:17 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,6 @@ int	set_key(t_envp *envp, char *key, char *value)
 	}
 	return (0);
 }
-
 
 static void	print_env(t_envp *envp)
 {
