@@ -3,31 +3,51 @@
 /*                                                        :::      ::::::::   */
 /*   sig_management.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
+/*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/02 12:25:19 by slebik            #+#    #+#             */
-/*   Updated: 2025/05/04 13:09:33 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/05/04 17:24:16 by slebik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-// Configuration des signaux pour le mode normal (readline)
+void	handle_sigint(int signo)
+{
+	(void)signo;
+	g_exit_status = 130; // 130 = interruption par Ctrl+C
+	write(1, "\n", 1);
+	rl_on_new_line();
+	rl_replace_line("", 0);
+	rl_redisplay();
+}
+
 void	setup_signals(void)
 {
 	struct sigaction	sa;
 
 	ft_memset(&sa, 0, sizeof(sa));
 	sa.sa_handler = handle_sigint;
+	sa.sa_flags = 0;
 	sigaction(SIGINT, &sa, NULL);
-	signal(SIGQUIT, SIG_IGN);
+	
+	ft_memset(&sa, 0, sizeof(sa));
+	sa.sa_handler = SIG_IGN;
+	sa.sa_flags = 0;
+	sigaction(SIGQUIT, &sa, NULL);
 }
+
 
 // Configuration des signaux pour le mode d'exécution de commande+
 void	setup_exec_signals(void)
 {
-	signal(SIGINT, SIG_DFL);
-	signal(SIGQUIT, SIG_DFL);
+	struct sigaction	sa;
+
+	ft_memset(&sa, 0, sizeof(sa));
+	sa.sa_handler = SIG_DFL;
+	sa.sa_flags = 0;
+	sigaction(SIGINT, &sa, NULL);
+	sigaction(SIGQUIT, &sa, NULL);
 }
 
 // Configuration des signaux pour le mode heredoc
@@ -37,6 +57,7 @@ void	setup_heredoc_signals(void)
 
 	ft_memset(&sa, 0, sizeof(sa));
 	sa.sa_handler = heredoc_sigint_handler;
+	sa.sa_flags = 0;
 	sigaction(SIGINT, &sa, NULL);
 	signal(SIGQUIT, SIG_IGN);
 }
@@ -44,6 +65,11 @@ void	setup_heredoc_signals(void)
 // Réinitialisation des signaux à leur état par défaut
 void	reset_signals(void)
 {
-	signal(SIGINT, SIG_DFL);
-	signal(SIGQUIT, SIG_DFL);
+	struct sigaction	sa;
+
+	ft_memset(&sa, 0, sizeof(sa));
+	sa.sa_handler = SIG_DFL;
+	sa.sa_flags = 0;
+	sigaction(SIGINT, &sa, NULL);
+	sigaction(SIGQUIT, &sa, NULL);
 }

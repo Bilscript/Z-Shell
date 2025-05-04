@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
+/*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 13:38:30 by bhamani           #+#    #+#             */
-/*   Updated: 2025/05/04 13:16:29 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/05/04 17:48:37 by slebik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,11 +50,17 @@ void	exec_builtin_or_real(t_command *cmd, t_envp_list *env_data)
 	int				status;
 	t_stdio_backup	backup;
 
+	// Si la préparation des heredocs a été interrompue, n'exécute pas la commande
 	if (!prepare_heredocs(cmd))
 	{
-		g_exit_status = 130;
+		// g_exit_status est déjà défini à 130 par prepare_heredocs
 		return ;
 	}
+	
+	// Si un heredoc a été interrompu (g_exit_status == 130), on ne continue pas
+	if (g_exit_status == 130)
+		return ;
+	
 	if (is_builtin(cmd->cmd) && !has_heredoc(cmd))
 	{
 		save_stdio(&backup);
@@ -99,6 +105,7 @@ void	exec_builtin_or_real(t_command *cmd, t_envp_list *env_data)
 		else
 			g_exit_status = WEXITSTATUS(status);
 	}
+	setup_signals(); // Réinitialiser les signaux après l'exécution
 }
 
 void	exec(t_command *cmd_line, t_envp_list *env_data, t_token *token)
@@ -116,36 +123,89 @@ void	exec(t_command *cmd_line, t_envp_list *env_data, t_token *token)
 	}
 }
 
-void	run_command(t_command *cmd, t_envp_list *env_data)
+static int    not_directory(char **path, t_command *cmd)
 {
-	pid_t	pid;
-	int		status;
-	char	*path;
+    struct stat    path_stat;
 
-	if (!cmd || !cmd->cmd)
-		return ;
-	path = parsing(env_data->head, cmd->cmd);
-	if (!path)
-	{
-		ft_putstr_fd(cmd->cmd, 2);
-		ft_putstr_fd(": command not found\n", 2);
-		g_exit_status = 127;
-		return ;
-	}
-	pid = fork();
-	if (pid < 0)
-	{
-		perror("fork failed");
-		printf("free path\n");
-		return ;
-	}
-	if (pid == 0)
-	{
-		execve(path, cmd->args, env_data->lenv);
-		perror("execve failed");
-		exit(EXIT_FAILURE);
-	}
-	else
-		waitpid(pid, &status, 0);
-	free(path);
+    if (stat(*path, &path_stat) == -1)
+    {
+        perror(*path);
+        free(*path);
+        *path = NULL;
+        g_exit_status = 126;
+        return (0);
+    }
+    if (!S_ISREG(path_stat.st_mode))
+    {
+        ft_putstr_fd("bash: ", 2);
+        ft_putstr_fd(cmd->args[0], 2);
+        ft_putstr_fd(": Is a directory\n", 2);
+        free(*path);
+        *path = NULL;
+        g_exit_status = 126;
+        return (0);
+    }
+    return (1);
+}
+
+int    check_cmd_path(char **path, t_command *cmd)
+{
+    if (!*path && ft_strchr(cmd->args[0], '/'))
+    {
+        perror(cmd->args[0]);
+        g_exit_status = 126;
+        return (0);
+    }
+    if (!*path)
+    {
+        ft_putstr_fd("minishell: command not found: ", 2);
+        ft_putstr_fd(cmd->args[0], 2);
+        ft_putstr_fd("\n", 2);
+        g_exit_status = 127;
+        return (0);
+    }
+    if (access(*path, X_OK) == -1)
+    {
+        perror(*path);
+        free(*path);
+        *path = NULL;
+        g_exit_status = 126;
+        return (0);
+    }
+    return (not_directory(path, cmd));
+}
+
+void    run_command(t_command *cmd, t_envp_list *env_data)
+{
+    pid_t    pid;
+    int        status;
+    char    *path;
+
+    if (!cmd || !cmd->cmd)
+        return ;
+    path = parsing(env_data->head, cmd->cmd);
+    if (!check_cmd_path(&path, cmd))
+        return ;
+    pid = fork();
+    if (pid < 0)
+    {
+        perror("fork failed");
+        free(path);
+        g_exit_status = 1;
+        return ;
+    }
+    if (pid == 0)
+    {
+        execve(path, cmd->args, env_data->lenv);
+        perror("execve failed");
+        free(path);
+        exit(126);
+    }
+    else
+    {
+        waitpid(pid, &status, 0);
+        if (WIFEXITED(status))
+            g_exit_status = WEXITSTATUS(status);
+    }
+    free(path);
 }

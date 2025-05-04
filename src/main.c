@@ -13,18 +13,6 @@
 #include "minishell.h"
 
 int	g_exit_status = 0;
-int	g_received_signal = 0;
-
-void	handle_sigint(int signo)
-{
-	(void)signo;
-	g_received_signal = 1;
-	g_exit_status = 130;
-	write(1, "\n", 1);
-	rl_on_new_line();
-	rl_replace_line("", 0);
-	rl_redisplay();
-}
 
 void	print_shell(void)
 {
@@ -55,11 +43,12 @@ void	parse_and_execute(char *input, t_envp_list *env_data)
 	t_token		*token;
 	t_command	*command;
 
+	if (g_exit_status == 130)
+		g_exit_status = 0;
 	token = tokenizer(input, env_data->head);
-	//print_tokens(token);
 	command = lexer(token);
-	//print_commands(command);
-	exec(command, env_data, token);
+	if (g_exit_status != 130)
+		exec(command, env_data, token);	
 	free_tab(env_data->lenv);
 	env_data->lenv = envp_to_array(env_data->head);
 	free_tokens(token);
@@ -71,11 +60,10 @@ int main(int ac, char **av, char **envp)
 	char		*input;
 	t_envp_list	env_data;
 
-//	print_shell();
+	//print shell
 	(void)ac;
 	(void)av;
 	g_exit_status = 0;
-	g_received_signal = 0;
 	setup_signals();
 	env_data.head = get_env(envp);
 	env_data.lenv = envp_to_array(env_data.head);

@@ -28,9 +28,9 @@
 # include <fcntl.h>
 # include <sys/types.h>
 # include <sys/wait.h>
+# include <sys/stat.h>
 
 extern int g_exit_status;
-extern int g_received_signal;
 
 typedef enum e_token_type
 {
@@ -223,6 +223,8 @@ void			exec_builtin_or_real(t_command *cmd, t_envp_list *env_data);
 void			save_stdio(t_stdio_backup *backup);
 void			restore_stdio(t_stdio_backup *backup);
 int				has_heredoc(t_command *cmd);
+
+int    check_cmd_path(char **path, t_command *cmd);
 
 // signalllll
 void	handle_sigint(int signo);

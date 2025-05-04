@@ -22,7 +22,12 @@ int	handle_input_redir(t_redir *redir)
 		perror(redir->filename);
 		return (-1);
 	}
-	dup2(fd, STDIN_FILENO);
+	if (dup2(fd, STDIN_FILENO) == -1)
+	{
+		perror("dup2 input");
+		close(fd);
+		return (-1);
+	}
 	close(fd);
 	return (0);
 }
@@ -37,7 +42,12 @@ int	handle_output_redir(t_redir *redir)
 		perror(redir->filename);
 		return (-1);
 	}
-	dup2(fd, STDOUT_FILENO);
+	if (dup2(fd, STDOUT_FILENO) == -1)
+	{
+		perror("dup2 output");
+		close(fd);
+		return (-1);
+	}
 	close(fd);
 	return (0);
 }
@@ -52,13 +62,19 @@ int	handle_append_redir(t_redir *redir)
 		perror(redir->filename);
 		return (-1);
 	}
-	dup2(fd, STDOUT_FILENO);
+	if (dup2(fd, STDOUT_FILENO) == -1)
+	{
+		perror("dup2 append");
+		close(fd);
+		return (-1);
+	}
 	close(fd);
 	return (0);
 }
 
 int	handle_heredoc_redir(t_redir *redir)
 {
+	// Vérifier que le descripteur est valide avant de l'utiliser
 	if (redir->heredoc_fd >= 0)
 	{
 		if (dup2(redir->heredoc_fd, STDIN_FILENO) == -1)
@@ -68,6 +84,7 @@ int	handle_heredoc_redir(t_redir *redir)
 			return (-1);
 		}
 		close(redir->heredoc_fd);
+		redir->heredoc_fd = -1; // evite le pblm de louis
 	}
 	return (0);
 }
@@ -76,18 +93,20 @@ int	handle_redirections(t_command *cmd)
 {
 	t_redir	*redir;
 
+	if (!cmd || !cmd->redirs)
+		return (0);
 	redir = cmd->redirs;
 	while (redir)
 	{
 		if (redir->type == TOKEN_REDIR_IN && handle_input_redir(redir) == -1)
 			return (-1);
-		else if (redir->type == TOKEN_REDIR_OUT
+		else if (redir->type == TOKEN_REDIR_OUT 
 			&& handle_output_redir(redir) == -1)
 			return (-1);
-		else if (redir->type == TOKEN_APPEND
+		else if (redir->type == TOKEN_APPEND 
 			&& handle_append_redir(redir) == -1)
 			return (-1);
-		else if (redir->type == TOKEN_HEREDOC
+		else if (redir->type == TOKEN_HEREDOC 
 			&& handle_heredoc_redir(redir) == -1)
 			return (-1);
 		redir = redir->next;
