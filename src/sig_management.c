@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   sig_management.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
+/*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/02 12:25:19 by slebik            #+#    #+#             */
-/*   Updated: 2025/05/04 17:24:16 by slebik           ###   ########.fr       */
+/*   Updated: 2025/05/04 23:11:52 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 void	handle_sigint(int signo)
 {
 	(void)signo;
-	g_exit_status = 130; // 130 = interruption par Ctrl+C
+	g_exit_status = 130;
 	write(1, "\n", 1);
 	rl_on_new_line();
 	rl_replace_line("", 0);
@@ -30,7 +30,6 @@ void	setup_signals(void)
 	sa.sa_handler = handle_sigint;
 	sa.sa_flags = 0;
 	sigaction(SIGINT, &sa, NULL);
-	
 	ft_memset(&sa, 0, sizeof(sa));
 	sa.sa_handler = SIG_IGN;
 	sa.sa_flags = 0;

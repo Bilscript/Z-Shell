@@ -14,6 +14,7 @@
 
 int	g_exit_status = 0;
 
+
 void	print_shell(void)
 {
 	printf("\033[1;34m");
@@ -43,24 +44,24 @@ void	parse_and_execute(char *input, t_envp_list *env_data)
 	t_token		*token;
 	t_command	*command;
 
-	if (g_exit_status == 130)
-		g_exit_status = 0;
 	token = tokenizer(input, env_data->head);
+	//print_tokens(token);
 	command = lexer(token);
-	if (g_exit_status != 130)
-		exec(command, env_data, token);	
+	//print_commands(command);
+	exec(command, env_data, token);
 	free_tab(env_data->lenv);
 	env_data->lenv = envp_to_array(env_data->head);
 	free_tokens(token);
 	free_command(command);
 }
 
+
 int main(int ac, char **av, char **envp)
 {
 	char		*input;
 	t_envp_list	env_data;
 
-	//print shell
+//	print_shell();
 	(void)ac;
 	(void)av;
 	g_exit_status = 0;
@@ -86,3 +87,43 @@ int main(int ac, char **av, char **envp)
 	rl_clear_history();
 	return (0);
 }
+
+//MAIN POUR TESTER 
+/*
+int	main(int ac, char **av, char **envp)
+{
+	char		*input;
+	t_envp_list	env_data;
+
+	(void)ac;
+	(void)av;
+	g_exit_status = 0;
+	setup_signals();
+	env_data.head = get_env(envp);
+	env_data.lenv = envp_to_array(env_data.head);
+
+	while (1)
+	{
+		if (isatty(STDIN_FILENO))
+			input = readline("Z-Shell> ");
+		else
+			input = readline("");
+
+		if (!input)
+		{
+			if (isatty(STDIN_FILENO))
+				printf("exit\n");
+			break ;
+		}
+		if (input[0] != '\0')
+		{
+			add_history(input);
+			parse_and_execute(input, &env_data);
+		}
+		free(input);
+	}
+	free_envp_list(&env_data);
+	rl_clear_history();
+	return (0);
+}
+*/

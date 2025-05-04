@@ -22,7 +22,6 @@ void	write_to_pipe(int fd, char *line)
 void	prepare_child(t_command *current, int in_fd, int *fd)
 {
 	setup_exec_signals();
-	// Gérer stdin (depuis le pipe précédent ou depuis fd standard)
 	if (in_fd != 0)
 	{
 		if (dup2(in_fd, STDIN_FILENO) == -1)
@@ -32,7 +31,6 @@ void	prepare_child(t_command *current, int in_fd, int *fd)
 		}
 		close(in_fd);
 	}
-	// Gérer stdout (vers le pipe suivant si non dernière commande)
 	if (current->next)
 	{
 		close(fd[0]);
@@ -43,8 +41,6 @@ void	prepare_child(t_command *current, int in_fd, int *fd)
 		}
 		close(fd[1]);
 	}
-	// Gérer les redirections spécifiques à la commande
-	// Les heredocs sont déjà préparés à ce stade
 	if (handle_redirections(current) == -1)
 		exit(1);
 }
@@ -59,7 +55,6 @@ void	exec_command_children(t_command *current, t_envp_list *env_data, int fd)
 		exec_builtin(current, env_data);
 		exit(g_exit_status);
 	}
-	
 	path = parsing(env_data->head, current->cmd);
 	if (!path)
 	{
@@ -67,7 +62,6 @@ void	exec_command_children(t_command *current, t_envp_list *env_data, int fd)
 		ft_putstr_fd(": command not found\n", 2);
 		exit(127);
 	}
-	
 	execve(path, current->args, env_data->lenv);
 	perror("execve failed");
 	free(path);
@@ -78,18 +72,13 @@ void	handle_parent(t_command *current, int *in_fd, int *fd)
 {
 	t_redir	*redir;
 
-	// Fermer les descripteurs de fichier inutilisés
 	if (*in_fd != 0)
 		close(*in_fd);
-
-	// Configurer l'entrée pour la prochaine commande
 	if (current->next)
 	{
 		close(fd[1]);
 		*in_fd = fd[0];
 	}
-	
-	// Fermer les descripteurs de fichier heredoc inutilisés
 	redir = current->redirs;
 	while (redir)
 	{
@@ -111,30 +100,22 @@ void	exec_piped_commands(t_command *cmd, t_envp_list *env_data)
 	t_command	*current;
 
 	in_fd = 0;
-	// Préparer tous les heredocs avant de créer les processus
 	if (!prepare_heredocs(cmd))
-	{
-		// g_exit_status est déjà défini à 130 par prepare_heredocs
 		return ;
-	}
-	
-	// Si un heredoc a été interrompu (g_exit_status == 130), on ne continue pas
 	if (g_exit_status == 130)
 		return ;
-	
 	current = cmd;
 	while (current)
 	{
 		if (current->next && pipe(fd) == -1)
 			error("pipe failed");
-		
 		pid = fork();
 		if (pid == 0)
 		{
 			setup_exec_signals();
 			if (current->next)
 				prepare_child(current, in_fd, fd);
-			else if (in_fd != 0) // Dernière commande
+			else if (in_fd != 0)
 			{
 				if (dup2(in_fd, STDIN_FILENO) == -1)
 				{
@@ -147,17 +128,13 @@ void	exec_piped_commands(t_command *cmd, t_envp_list *env_data)
 			}
 			else if (handle_redirections(current) == -1)
 				exit(1);
-			
 			exec_command_children(current, env_data, in_fd);
 		}
 		else if (pid < 0)
 			error("fork failed");
-		
 		handle_parent(current, &in_fd, fd);
 		current = current->next;
 	}
-	
-	// Attendre que tous les processus enfants terminent
 	while (wait(&status) > 0)
 	{
 		if (WIFSIGNALED(status))
@@ -170,5 +147,5 @@ void	exec_piped_commands(t_command *cmd, t_envp_list *env_data)
 		else
 			g_exit_status = WEXITSTATUS(status);
 	}
-	setup_signals(); // Réinitialiser les signaux après que tous les processus aient terminé
+	setup_signals();
 }
