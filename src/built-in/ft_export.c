@@ -6,7 +6,7 @@
 /*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 14:12:19 by bhamani           #+#    #+#             */
-/*   Updated: 2025/05/03 14:53:15 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/05/04 12:12:36 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,7 +104,7 @@ void	ft_export(t_command *cmd, t_envp *envp)
 			write(2, "bash: export: `", 15);
 			write(2, cmd->args[i], strlen(cmd->args[i]));
 			write(2, "': not a valid identifier\n", 26);
-			g_exit_status = EXIT_BUILTIN_ERROR;
+			g_exit_status = EXIT_GENERAL_ERROR;
 		}
 		else
 			handle_export_arg(&envp, cmd->args[i]);

@@ -6,27 +6,45 @@
 /*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 11:37:44 by bhamani           #+#    #+#             */
-/*   Updated: 2025/04/27 13:13:50 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/05/04 13:22:52 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-char	**envp_to_array(t_envp *envp)
+void	free_envp_array(char **envp_array, size_t count)
+{
+	while (count--)
+		free(envp_array[count]);
+	free(envp_array);
+}
+
+static char	**alloc_envp_array(t_envp *envp, size_t *count)
 {
 	t_envp	*current;
-	size_t	count;
-	char	**envp_array;
-	size_t	len;
+	char	**array;
 
+	*count = 0;
 	current = envp;
-	count = 0;
 	while (current)
 	{
-		count++;
+		(*count)++;
 		current = current->next;
 	}
-	envp_array = (char **)malloc((count + 1) * sizeof(char *));
+	array = (char **)malloc(sizeof(char *) * (*count + 1));
+	if (!array)
+		return (NULL);
+	return (array);
+}
+
+char	**envp_to_array(t_envp *envp)
+{
+	char		**envp_array;
+	size_t		count;
+	size_t		len;
+	t_envp		*current;
+
+	envp_array = alloc_envp_array(envp, &count);
 	if (!envp_array)
 		return (NULL);
 	current = envp;
@@ -34,22 +52,14 @@ char	**envp_to_array(t_envp *envp)
 	while (current)
 	{
 		len = ft_strlen(current->key) + ft_strlen(current->value) + 2;
-		envp_array[count] = (char *)malloc(len * sizeof(char));
+		envp_array[count] = malloc(sizeof(char) * len);
 		if (!envp_array[count])
-		{
-			while (count > 0)
-			{
-				free(envp_array[count - 1]);
-				count--;
-			}
-			free(envp_array);
-			return (NULL);
-		}
+			return (free_envp_array(envp_array, count), NULL);
 		ft_strlcpy(envp_array[count], current->key, len);
 		ft_strlcat(envp_array[count], "=", len);
 		ft_strlcat(envp_array[count], current->value, len);
-		count++;
 		current = current->next;
+		count++;
 	}
 	envp_array[count] = NULL;
 	return (envp_array);

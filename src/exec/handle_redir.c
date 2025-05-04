@@ -72,19 +72,23 @@ int	handle_heredoc_redir(t_redir *redir)
 	return (0);
 }
 
-int handle_redirections(t_command *cmd)
+int	handle_redirections(t_command *cmd)
 {
-	t_redir	*redir = cmd->redirs;
+	t_redir	*redir;
 
+	redir = cmd->redirs;
 	while (redir)
 	{
 		if (redir->type == TOKEN_REDIR_IN && handle_input_redir(redir) == -1)
 			return (-1);
-		else if (redir->type == TOKEN_REDIR_OUT && handle_output_redir(redir) == -1)
+		else if (redir->type == TOKEN_REDIR_OUT
+			&& handle_output_redir(redir) == -1)
 			return (-1);
-		else if (redir->type == TOKEN_APPEND && handle_append_redir(redir) == -1)
+		else if (redir->type == TOKEN_APPEND
+			&& handle_append_redir(redir) == -1)
 			return (-1);
-		else if (redir->type == TOKEN_HEREDOC && handle_heredoc_redir(redir) == -1)
+		else if (redir->type == TOKEN_HEREDOC
+			&& handle_heredoc_redir(redir) == -1)
 			return (-1);
 		redir = redir->next;
 	}

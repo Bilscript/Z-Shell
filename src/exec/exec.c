@@ -6,7 +6,7 @@
 /*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 13:38:30 by bhamani           #+#    #+#             */
-/*   Updated: 2025/05/03 15:08:09 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/05/04 13:16:29 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,28 +44,28 @@ void	exec_builtin(t_command *cmd, t_envp_list *env_data)
 		ft_exit(cmd);
 }
 
-void exec_builtin_or_real(t_command *cmd, t_envp_list *env_data)
+void	exec_builtin_or_real(t_command *cmd, t_envp_list *env_data)
 {
-    pid_t			pid;
-    int				status;
-    t_stdio_backup	backup;
+	pid_t			pid;
+	int				status;
+	t_stdio_backup	backup;
 
 	if (!prepare_heredocs(cmd))
 	{
 		g_exit_status = 130;
 		return ;
 	}
-    if (is_builtin(cmd->cmd) && !has_heredoc(cmd))
-    {
-        save_stdio(&backup);
-        if (handle_redirections(cmd) == -1)
+	if (is_builtin(cmd->cmd) && !has_heredoc(cmd))
+	{
+		save_stdio(&backup);
+		if (handle_redirections(cmd) == -1)
 		{
 			restore_stdio(&backup);
 			return ;
 		}
-        exec_builtin(cmd, env_data);
-        restore_stdio(&backup);
-    }
+		exec_builtin(cmd, env_data);
+		restore_stdio(&backup);
+	}
 	else
 	{
 		pid = fork();
@@ -100,8 +100,6 @@ void exec_builtin_or_real(t_command *cmd, t_envp_list *env_data)
 			g_exit_status = WEXITSTATUS(status);
 	}
 }
-
-
 
 void	exec(t_command *cmd_line, t_envp_list *env_data, t_token *token)
 {

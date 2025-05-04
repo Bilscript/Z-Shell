@@ -6,7 +6,7 @@
 /*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/17 16:57:58 by bhamani           #+#    #+#             */
-/*   Updated: 2025/05/03 15:47:45 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/05/04 11:38:20 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,4 +96,3 @@ t_command	*lexer(t_token *tokens)
 	}
 	return (head);
 }
-

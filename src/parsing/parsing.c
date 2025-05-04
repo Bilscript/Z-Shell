@@ -12,102 +12,80 @@
 
 #include "minishell.h"
 
-char	*get_value(t_envp *envp, char *key)
-{
-	while (envp)
-	{
-		if (ft_strcmp(envp->key, key) == 0)
-			return (envp->value);
-		envp = envp->next;
-	}
-	return (NULL);
-}
-
-void	append_to_buf(t_parse_ctx *ctx, const char *str, size_t len)
-{
-	size_t	i;
-
-	i = 0;
-	while (i < len)
-		ctx->buf[(*ctx->len)++] = str[i++];
-}
-
-void	token_dollar_inside_word(t_parse_ctx *ctx, t_envp *envp)
+int	handle_variable(t_parse_ctx *ctx, t_envp *envp)
 {
 	size_t	start;
 	char	*key;
 	char	*val;
-	char *status_str;
 
 	if (ctx->input[*ctx->i + 1] == '?')
-	{
-		status_str = ft_itoa(g_exit_status);
-		append_to_buf(ctx, status_str, ft_strlen(status_str));
-		free(status_str);
-		(*ctx->i) += 2;
-		return ;
-	}
-	start = ++(*ctx->i);
-	if (!ctx->input[*ctx->i] || !(ft_isalnum(ctx->input[*ctx->i])
-			|| ctx->input[*ctx->i] == '_'))
-	{
-		ctx->buf[(*ctx->len)++] = '$';
-		return ;
-	}
-	while (ctx->input[*ctx->i] && (ft_isalnum(ctx->input[*ctx->i])
-			|| ctx->input[*ctx->i] == '_'))
+		return (handle_special_var(ctx));
+	(*ctx->i)++;
+	if (!ctx->input[*ctx->i] || (!ft_isalnum(ctx->input[*ctx->i])
+			&& ctx->input[*ctx->i] != '_'))
+		return (ctx->buf[(*ctx->len)++] = '$', 1);
+	start = *ctx->i;
+	while (ft_isalnum(ctx->input[*ctx->i]) || ctx->input[*ctx->i] == '_')
 		(*ctx->i)++;
 	key = ft_strndup(ctx->input + start, *ctx->i - start);
 	if (!key)
-		return ;
+		return (0);
 	val = get_value(envp, key);
 	free(key);
-	if (!val)
-		return ;
-	append_to_buf(ctx, val, ft_strlen(val));
+	if (val)
+		append_to_buf(ctx, val, ft_strlen(val));
+	return (1);
 }
 
+int	fill_token_buf(t_parse_ctx *ctx, t_envp *envp, t_quote_status *quote_status)
+{
+	char	c;
+
+	while (ctx->input[*ctx->i]
+		&& !ft_isspace(ctx->input[*ctx->i])
+		&& ctx->input[*ctx->i] != '|'
+		&& ctx->input[*ctx->i] != '<'
+		&& ctx->input[*ctx->i] != '>')
+	{
+		if (ctx->input[*ctx->i] == '"' || ctx->input[*ctx->i] == '\'')
+		{
+			if (!handle_quotes(ctx, envp, quote_status))
+				return (0);
+		}
+		else if (ctx->input[*ctx->i] == '$')
+			handle_variable(ctx, envp);
+		else
+		{
+			c = ctx->input[*ctx->i];
+			ctx->buf[(*ctx->len)++] = c;
+			(*ctx->i)++;
+		}
+	}
+	return (1);
+}
 
 int	token_word(char *input, size_t *i, t_token **tokens, t_envp *envp)
 {
-	char			*buf;
-	size_t			len;
-	t_parse_ctx		ctx;
 	t_quote_status	quote_status;
+	size_t			len;
+	size_t			est_len;
+	char			*buf;
+	t_parse_ctx		ctx;
 
+	est_len = estimate_token_size(input, *i, envp);
+	buf = malloc(est_len + 1);
+	len = 0;
 	quote_status = QUOTE_NONE;
-	buf = malloc(strlen(input + *i) + 1);
 	if (!buf)
 		return (0);
-	len = 0;
 	ctx = init_parse_ctx(input, i, buf, &len);
-	while (input[*i] && !ft_isspace(input[*i]) && input[*i] != '|'
-		&& input[*i] != '<' && input[*i] != '>')
-	{
-		if (input[*i] == '"')
-		{
-			quote_status = QUOTE_DOUBLE;
-			if (!handle_double_quote(&ctx, envp))
-				return (free(buf), 0);
-		}
-		else if (input[*i] == '\'')
-		{
-			quote_status = QUOTE_SINGLE;
-			if (!handle_single_quote(&ctx))
-				return (free(buf), 0);
-		}
-		else if (input[*i] == '$')
-			token_dollar_inside_word(&ctx, envp);
-		else
-			ctx.buf[(*ctx.len)++] = input[(*ctx.i)++];
-	}
+	if (!fill_token_buf(&ctx, envp, &quote_status))
+		return (free(buf), 0);
 	ctx.buf[*ctx.len] = '\0';
 	if (*ctx.len == 0 && quote_status == QUOTE_NONE)
-	{
-		free(buf);
-		return (1);
-	}
+		return (free(buf), 1);
 	add_token(tokens, new_token(TOKEN_WORD, ctx.buf, *ctx.len, quote_status));
+	free(ctx.buf);
 	return (1);
 }
 

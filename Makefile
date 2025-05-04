@@ -39,6 +39,7 @@ SRC     = \
 	src/parsing/free_function.c \
 	src/parsing/parse_token.c \
 	src/parsing/parsing.c \
+	src/parsing/handle_dollars.c \
 	src/parsing/parsing_handler.c \
 	src/parsing/token_lexer.c \
 	src/parsing/token_lexer_utils.c \

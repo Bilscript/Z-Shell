@@ -6,7 +6,7 @@
 /*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 17:21:26 by bhamani           #+#    #+#             */
-/*   Updated: 2025/04/29 12:08:31 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/05/04 13:17:35 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,10 +104,7 @@ t_envp	*get_env(char **env)
 			return (res);
 		value = ft_strdup(env[i] + len + 1);
 		if (!value)
-		{
-			free(key);
-			return (res);
-		}
+			return (free(key), res);
 		add_envp_back(&res, new_envp(key, value, false));
 		free(key);
 		free(value);

@@ -6,133 +6,117 @@
 /*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 12:14:09 by slebik            #+#    #+#             */
-/*   Updated: 2025/04/27 11:38:55 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/05/04 12:05:19 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-/*
-char	*strjoin_and_free(char *s1, char *s2)
-{
-	char	*new;
 
-	new = ft_strjoin(s1, s2);
-	free(s1);
-	return (new);
+int	handle_quotes(t_parse_ctx *ctx, t_envp *envp, t_quote_status *qs)
+{
+	char	quote;
+
+	quote = ctx->input[*ctx->i];
+	if (quote == '"')
+		*qs = QUOTE_DOUBLE;
+	else
+		*qs = QUOTE_SINGLE;
+	(*ctx->i)++;
+	handle_quote_content(ctx, envp, quote);
+	if (!ctx->input[*ctx->i])
+	{
+		ft_putstr_fd("syntax error: unclosed quote\n", 2);
+		g_exit_status = 2;
+		return (0);
+	}
+	(*ctx->i)++;
+	return (1);
 }
 
-char	*extract_dollar(char *input, size_t *i,
-			t_envp *envp, t_quote_status sta)
+size_t	handle_dollar_double_quote(char *input, size_t *i, t_envp *envp)
 {
+	size_t	j;
 	char	*key;
-	char	*value;
-	size_t	start;
+	char	*val;
+	size_t	len;
 
-	(*i)++;
-	if (input[*i] == '$')
-	{
-		(*i)++;
-		return (ft_itoa(getpid()));
-	}
-	start = *i;
-	while (ft_isalnum(input[*i]) || input[*i] == '_')
-		(*i)++;
-	if (start == *i)
-		return (ft_strdup("$"));
-	key = ft_substr(input, start, *i - start);
-	if (!key)
-		return (NULL);
-	value = get_env_variable(envp, key, sta);
+	len = 0;
+	j = *i + 1;
+	while (ft_isalnum(input[j]) || input[j] == '_')
+		j++;
+	key = ft_strndup(input + *i + 1, j - (*i + 1));
+	val = get_value(envp, key);
+	if (val)
+		len = ft_strlen(val);
 	free(key);
-	if (value)
-		return (ft_strdup(value));
-	return (ft_strdup(""));
+	*i = j;
+	return (len);
 }
 
-void	parse_double_quote(char *input, size_t *i, t_token **tkn, t_envp *envp)
+size_t	handle_double_quote(char *input, size_t *i, t_envp *envp)
 {
-	char	*joined;
-	char	*tmp;
-	size_t	start;
+	size_t	size;
+	char	quote;
 
-	(*i)++;
-	joined = ft_strdup("");
-	if (!joined)
-		return ;
-	if (input[*i] == '"')
+	size = 0;
+	quote = input[(*i)++];
+	while (input[*i] && input[*i] != quote)
 	{
-		add_token(tkn, new_token(TOKEN_WORD, "", 0, QUOTE_DOUBLE));
-		(*i)++;
-		free(joined);
-		return ;
-	}
-	while (input[*i] && input[*i] != '"')
-	{
-		if (input[*i] == '$')
-			tmp = extract_dollar(input, i, envp, QUOTE_DOUBLE);
+		if (quote == '"' && input[*i] == '$')
+			size += handle_dollar_double_quote(input, i, envp);
 		else
 		{
-			start = *i;
-			while (input[*i] && input[*i] != '"' && input[*i] != '$')
-				(*i)++;
-			tmp = ft_substr(input, start, *i - start);
+			size++;
+			(*i)++;
 		}
-		if (!tmp)
-			return ;
-		joined = strjoin_and_free(joined, tmp);
-		free(tmp);
 	}
-	if (input[*i] == '"')
+	if (input[*i])
 		(*i)++;
-	else
-		printf("\033[0;31mSyntax error: unclosed double quote\033[0m\n");
-	add_token(tkn, new_token(TOKEN_WORD, joined,
-			ft_strlen(joined), QUOTE_DOUBLE));
-	free(joined);
+	return (size);
 }
 
-void	parse_simple_quote(char *input, size_t *i, t_token **tokens)
+size_t	handle_dollar(char *input, size_t *i, t_envp *envp)
 {
-	size_t	start;
-
-	if (input[*i] == '\'' && input[*i + 1] == '\'')
-	{
-		add_token(tokens, new_token(TOKEN_WORD, "", 0, QUOTE_SINGLE));
-		(*i) += 2;
-		return ;
-	}
-	start = ++(*i);
-	while (input[*i] && input[*i] != '\'')
-		(*i)++;
-	if (input[*i] == '\'')
-	{
-		add_token(tokens, new_token(TOKEN_WORD, &input[start],
-				*i - start, QUOTE_SINGLE));
-		(*i)++;
-	}
-	else
-		printf("\033[0;31mSyntax error: unclosed single quote\033[0m\n");
-}
-
-char	*get_env_variable(t_envp *env, char *key, t_quote_status status)
-{
-	int		i;
+	size_t	j;
+	char	*key;
+	char	*val;
 	size_t	len;
-	char	**envp;
 
-	envp = env_list_to_array(env);
-	if (status == QUOTE_SINGLE)
-		return (NULL);
-	if (!envp || !key)
-		return (NULL);
-	len = ft_strlen(key);
-	i = 0;
-	while (envp[i])
+	if (input[*i + 1] == '?')
 	{
-		if (ft_strncmp(envp[i], key, len) == 0 && envp[i][len] == '=')
-			return (envp[i] + len + 1);
-		i++;
+		*i += 2;
+		return (10);
 	}
-	return (NULL);
+	j = *i + 1;
+	while (ft_isalnum(input[j]) || input[j] == '_')
+		j++;
+	key = ft_strndup(input + *i + 1, j - (*i + 1));
+	val = get_value(envp, key);
+	len = 0;
+	if (val)
+		len = ft_strlen(val);
+	free(key);
+	*i = j;
+	return (len);
 }
-*/
+
+size_t	estimate_token_size(char *input, size_t i, t_envp *envp)
+{
+	size_t	size;
+
+	size = 0;
+	while (input[i] && !ft_isspace(input[i])
+		&& input[i] != '|' && input[i] != '<' && input[i] != '>')
+	{
+		if (input[i] == '\'' || input[i] == '"')
+			size += handle_double_quote(input, &i, envp);
+		else if (input[i] == '$')
+			size += handle_dollar(input, &i, envp);
+		else
+		{
+			size++;
+			i++;
+		}
+	}
+	return (size);
+}

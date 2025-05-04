@@ -6,26 +6,29 @@
 /*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 11:26:24 by bhamani           #+#    #+#             */
-/*   Updated: 2025/05/03 14:39:27 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/05/04 12:18:32 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static void	print_cd_error(char *msg, char *arg, int code)
+static void	print_cd_error(char *arg, char *msg, int code)
 {
 	ft_putstr_fd("cd: ", 2);
 	if (arg)
 	{
 		ft_putstr_fd(arg, 2);
-		ft_putstr_fd(": ", 2);
+		if (msg)
+		{
+			ft_putstr_fd(": ", 2);
+			ft_putstr_fd(msg, 2);
+		}
 	}
-	if (msg)
+	else if (msg)
 		ft_putstr_fd(msg, 2);
 	ft_putstr_fd("\n", 2);
 	g_exit_status = code;
 }
-
 
 void	ft_cd(t_command *cmd, t_envp *envp)
 {

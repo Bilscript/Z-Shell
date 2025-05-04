@@ -23,7 +23,7 @@ int	process_heredoc(t_redir *redir)
 	return (1);
 }
 
-int    has_heredoc(t_command *cmd)
+int	has_heredoc(t_command *cmd)
 {
 	t_redir	*redir;
 
@@ -31,17 +31,18 @@ int    has_heredoc(t_command *cmd)
 	while (redir)
 	{
 		if (redir->type == TOKEN_HEREDOC)
-			return 1;
+			return (1);
 		redir = redir->next;
 	}
-	return 0;
+	return (0);
 }
 
 int	prepare_heredocs(t_command *cmd)
 {
-	t_command	*current = cmd;
+	t_command	*current;
 	t_redir		*redir;
 
+	current = cmd;
 	while (current)
 	{
 		redir = current->redirs;
@@ -50,7 +51,7 @@ int	prepare_heredocs(t_command *cmd)
 			if (redir->type == TOKEN_HEREDOC)
 			{
 				if (!process_heredoc(redir))
-					return (0); // interruption (ex: CTRL+C)
+					return (0);
 			}
 			redir = redir->next;
 		}
@@ -84,7 +85,6 @@ void	here_doc_child(int *fd, char *limiter)
 		}
 		write_to_pipe(fd[1], line);
 	}
-	// (EOF / Ctrl+D)
 	close(fd[1]);
 	exit(0);
 }
