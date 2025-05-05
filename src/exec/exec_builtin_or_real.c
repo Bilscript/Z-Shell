@@ -29,10 +29,7 @@ static void	handle_signal_status(int status)
 	if (WIFSIGNALED(status))
 	{
 		if (WTERMSIG(status) == SIGINT)
-		{
 			g_exit_status = 130;
-			write(1, "\n", 1);
-		}
 		else if (WTERMSIG(status) == SIGQUIT)
 		{
 			g_exit_status = 131;
@@ -61,8 +58,11 @@ void	exec_builtin_or_real(t_command *cmd, t_envp_list *env_data)
 {
 	t_stdio_backup	backup;
 
-	if (!prepare_heredocs(cmd) || g_exit_status == 130)
+	if (!prepare_heredocs(cmd)) // ancienne version "if (!prepare_heredocs(cmd) || g_exit_status == 130)"
+	{
+		g_exit_status = 130;
 		return ;
+	}
 	if (is_builtin(cmd->cmd) && !has_heredoc(cmd))
 	{
 		save_stdio(&backup);
