@@ -6,7 +6,7 @@
 /*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 17:49:19 by slebik            #+#    #+#             */
-/*   Updated: 2025/05/01 11:59:57 by slebik           ###   ########.fr       */
+/*   Updated: 2025/05/05 15:52:21 by slebik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,12 +18,6 @@ void	error(char *error_msg)
 {
 	ft_putstr_fd(error_msg, 2);
 	exit(1);
-}
-
-void	errorcmd(const char *cmd, int exit_code)
-{
-	perror(cmd);
-	exit(exit_code);
 }
 
 char	*get_path_from_list(t_envp *env_list)

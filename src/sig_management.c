@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   sig_management.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
+/*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/02 12:25:19 by slebik            #+#    #+#             */
-/*   Updated: 2025/05/04 23:11:52 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/05/05 11:58:30 by slebik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,8 +36,6 @@ void	setup_signals(void)
 	sigaction(SIGQUIT, &sa, NULL);
 }
 
-
-// Configuration des signaux pour le mode d'exécution de commande+
 void	setup_exec_signals(void)
 {
 	struct sigaction	sa;
@@ -49,7 +47,6 @@ void	setup_exec_signals(void)
 	sigaction(SIGQUIT, &sa, NULL);
 }
 
-// Configuration des signaux pour le mode heredoc
 void	setup_heredoc_signals(void)
 {
 	struct sigaction	sa;
@@ -61,7 +58,6 @@ void	setup_heredoc_signals(void)
 	signal(SIGQUIT, SIG_IGN);
 }
 
-// Réinitialisation des signaux à leur état par défaut
 void	reset_signals(void)
 {
 	struct sigaction	sa;

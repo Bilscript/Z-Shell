@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipex.c                                            :+:      :+:    :+:   */
+/*   handle_pipe.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/04/26 16:01:23 by slebik            #+#    #+#             */
-/*   Updated: 2025/04/26 16:01:23 by slebik           ###   ########.fr       */
+/*   Created: 2025/05/05 14:03:52 by slebik            #+#    #+#             */
+/*   Updated: 2025/05/05 14:03:52 by slebik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,63 +89,4 @@ void	handle_parent(t_command *current, int *in_fd, int *fd)
 		}
 		redir = redir->next;
 	}
-}
-
-void	exec_piped_commands(t_command *cmd, t_envp_list *env_data)
-{
-	int			fd[2];
-	int			in_fd;
-	pid_t		pid;
-	int			status;
-	t_command	*current;
-
-	in_fd = 0;
-	if (!prepare_heredocs(cmd))
-		return ;
-	if (g_exit_status == 130)
-		return ;
-	current = cmd;
-	while (current)
-	{
-		if (current->next && pipe(fd) == -1)
-			error("pipe failed");
-		pid = fork();
-		if (pid == 0)
-		{
-			setup_exec_signals();
-			if (current->next)
-				prepare_child(current, in_fd, fd);
-			else if (in_fd != 0)
-			{
-				if (dup2(in_fd, STDIN_FILENO) == -1)
-				{
-					perror("dup2 stdin");
-					exit(1);
-				}
-				close(in_fd);
-				if (handle_redirections(current) == -1)
-					exit(1);
-			}
-			else if (handle_redirections(current) == -1)
-				exit(1);
-			exec_command_children(current, env_data, in_fd);
-		}
-		else if (pid < 0)
-			error("fork failed");
-		handle_parent(current, &in_fd, fd);
-		current = current->next;
-	}
-	while (wait(&status) > 0)
-	{
-		if (WIFSIGNALED(status))
-		{
-			if (WTERMSIG(status) == SIGINT)
-				g_exit_status = 130;
-			else if (WTERMSIG(status) == SIGQUIT)
-				g_exit_status = 131;
-		}
-		else
-			g_exit_status = WEXITSTATUS(status);
-	}
-	setup_signals();
 }

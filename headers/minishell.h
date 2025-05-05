@@ -30,7 +30,7 @@
 # include <sys/wait.h>
 # include <sys/stat.h>
 
-extern int g_exit_status;
+extern int	g_exit_status;
 
 typedef enum e_token_type
 {
@@ -132,7 +132,8 @@ int				handle_quotes(t_parse_ctx *ctx, t_envp *envp,
 					t_quote_status *qs);
 int				handle_variable(t_parse_ctx *ctx, t_envp *envp);
 int				handle_special_var(t_parse_ctx *ctx);
-void			handle_quote_content(t_parse_ctx *ctx, t_envp *envp, char quote);
+void			handle_quote_content(t_parse_ctx *ctx, t_envp *envp,
+					char quote);
 void			free_tokens(t_token *list);
 void			print_tokens(t_token *list);
 int				ft_isspace(char c);
@@ -212,8 +213,6 @@ void			handle_redir_in(char *input, size_t *i, t_token **tokens);
 void			accolade_gestion(char *input, size_t *i, char **tmp);
 void			get_pid_var(char **value, size_t *i, t_token **tkn,
 					t_quote_status q_st);
-//int				handle_single_quote(t_parse_ctx *ctx);
-//int				handle_double_quote(t_parse_ctx *ctx, t_envp *envp);
 t_parse_ctx		init_parse_ctx(char *input, size_t *i, char *buf, size_t *len);
 int				has_pipe(t_token *tokens);
 void			free_envp_list(t_envp_list *envp_list);
@@ -223,15 +222,14 @@ void			exec_builtin_or_real(t_command *cmd, t_envp_list *env_data);
 void			save_stdio(t_stdio_backup *backup);
 void			restore_stdio(t_stdio_backup *backup);
 int				has_heredoc(t_command *cmd);
-
-int    check_cmd_path(char **path, t_command *cmd);
-
+int				check_cmd_path(char **path, t_command *cmd);
 // signalllll
-void	handle_sigint(int signo);
-void	heredoc_sigint_handler(int signo);
-void	setup_signals(void);
-void	setup_exec_signals(void);
-void	setup_heredoc_signals(void);
-void	reset_signals(void);
+void			handle_sigint(int signo);
+void			heredoc_sigint_handler(int signo);
+void			setup_signals(void);
+void			setup_exec_signals(void);
+void			setup_heredoc_signals(void);
+void			reset_signals(void);
+int				not_directory(char **path, t_command *cmd);
 
 #endif

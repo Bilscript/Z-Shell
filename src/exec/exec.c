@@ -3,103 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
+/*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 13:38:30 by bhamani           #+#    #+#             */
-/*   Updated: 2025/05/04 23:09:35 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/05/05 16:21:18 by slebik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-int	is_builtin(char *cmd)
-{
-	if (!cmd)
-		return (0);
-	return (!ft_strcmp(cmd, "echo")
-		|| !ft_strcmp(cmd, "cd")
-		|| !ft_strcmp(cmd, "pwd")
-		|| !ft_strcmp(cmd, "export")
-		|| !ft_strcmp(cmd, "unset")
-		|| !ft_strcmp(cmd, "env")
-		|| !ft_strcmp(cmd, "exit"));
-}
-
-void	exec_builtin(t_command *cmd, t_envp_list *env_data)
-{
-	prepare_heredocs(cmd);
-	if (!ft_strcmp(cmd->cmd, "echo"))
-		ft_echo(cmd);
-	else if (!ft_strcmp(cmd->cmd, "cd"))
-		ft_cd(cmd, env_data->head);
-	else if (!ft_strcmp(cmd->cmd, "pwd"))
-		ft_pwd();
-	else if (!ft_strcmp(cmd->cmd, "export"))
-		ft_export(cmd, env_data->head);
-	else if (!ft_strcmp(cmd->cmd, "unset"))
-		ft_unset(cmd, env_data->head);
-	else if (!ft_strcmp(cmd->cmd, "env"))
-		ft_env(cmd, env_data->head);
-	else if (!ft_strcmp(cmd->cmd, "exit"))
-		ft_exit(cmd);
-}
-
-void	exec_builtin_or_real(t_command *cmd, t_envp_list *env_data)
-{
-	pid_t			pid;
-	int				status;
-	t_stdio_backup	backup;
-
-	if (!prepare_heredocs(cmd))
-		return ;
-	if (g_exit_status == 130)
-		return ;
-	if (is_builtin(cmd->cmd) && !has_heredoc(cmd))
-	{
-		save_stdio(&backup);
-		if (handle_redirections(cmd) == -1)
-		{
-			restore_stdio(&backup);
-			return ;
-		}
-		exec_builtin(cmd, env_data);
-		restore_stdio(&backup);
-	}
-	else
-	{
-		pid = fork();
-		if (pid == 0)
-		{
-			setup_exec_signals();
-			if (handle_redirections(cmd) == -1)
-				exit(1);
-			if (is_builtin(cmd->cmd))
-				exec_builtin(cmd, env_data);
-			else
-				run_command(cmd, env_data);
-			exit(g_exit_status);
-		}
-		else if (pid < 0)
-			error("fork failed");
-		waitpid(pid, &status, 0);
-		if (WIFSIGNALED(status))
-		{
-			if (WTERMSIG(status) == SIGINT)
-			{
-				g_exit_status = 130;
-				write(1, "\n", 1);
-			}
-			else if (WTERMSIG(status) == SIGQUIT)
-			{
-				g_exit_status = 131;
-				ft_putendl_fd("Quit (core dumped)", 2);
-			}
-		}
-		else
-			g_exit_status = WEXITSTATUS(status);
-	}
-	setup_signals();
-}
 
 void	exec(t_command *cmd_line, t_envp_list *env_data, t_token *token)
 {
@@ -116,76 +27,18 @@ void	exec(t_command *cmd_line, t_envp_list *env_data, t_token *token)
 	}
 }
 
-static int    not_directory(char **path, t_command *cmd)
-{
-	struct stat	path_stat;
-
-	if (stat(*path, &path_stat) == -1)
-	{
-		perror(*path);
-		free(*path);
-		*path = NULL;
-		g_exit_status = 126;
-		return (0);
-	}
-	if (!S_ISREG(path_stat.st_mode))
-	{
-		ft_putstr_fd("bash: ", 2);
-		ft_putstr_fd(cmd->args[0], 2);
-		ft_putstr_fd(": Is a directory\n", 2);
-		free(*path);
-		*path = NULL;
-		g_exit_status = 126;
-		return (0);
-	}
-	return (1);
-}
-
-int	check_cmd_path(char **path, t_command *cmd)
-{
-	if (!*path && ft_strchr(cmd->args[0], '/'))
-	{
-		perror(cmd->args[0]);
-		g_exit_status = 126;
-		return (0);
-	}
-	if (!*path)
-	{
-		ft_putstr_fd("minishell: command not found: ", 2);
-		ft_putstr_fd(cmd->args[0], 2);
-		ft_putstr_fd("\n", 2);
-		g_exit_status = 127;
-		return (0);
-	}
-	if (access(*path, X_OK) == -1)
-	{
-		perror(*path);
-		free(*path);
-		*path = NULL;
-		g_exit_status = 126;
-		return (0);
-	}
-	return (not_directory(path, cmd));
-}
-
-void	run_command(t_command *cmd, t_envp_list *env_data)
+static int	fork_and_exec(char *path, t_command *cmd, t_envp_list *env_data)
 {
 	pid_t	pid;
 	int		status;
-	char	*path;
 
-	if (!cmd || !cmd->cmd)
-		return ;
-	path = parsing(env_data->head, cmd->cmd);
-	if (!check_cmd_path(&path, cmd))
-		return ;
 	pid = fork();
 	if (pid < 0)
 	{
 		perror("fork failed");
 		free(path);
 		g_exit_status = 1;
-		return ;
+		return (1);
 	}
 	if (pid == 0)
 	{
@@ -194,11 +47,22 @@ void	run_command(t_command *cmd, t_envp_list *env_data)
 		free(path);
 		exit(126);
 	}
-	else
-	{
-		waitpid(pid, &status, 0);
-		if (WIFEXITED(status))
-			g_exit_status = WEXITSTATUS(status);
-	}
+	waitpid(pid, &status, 0);
+	if (WIFEXITED(status))
+		g_exit_status = WEXITSTATUS(status);
+	return (0);
+}
+
+void	run_command(t_command *cmd, t_envp_list *env_data)
+{
+	char	*path;
+
+	if (!cmd || !cmd->cmd)
+		return ;
+	path = parsing(env_data->head, cmd->cmd);
+	if (!check_cmd_path(&path, cmd))
+		return ;
+	if (fork_and_exec(path, cmd, env_data))
+		return ;
 	free(path);
 }

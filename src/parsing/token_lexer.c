@@ -3,22 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   token_lexer.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
+/*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/17 16:57:58 by bhamani           #+#    #+#             */
-/*   Updated: 2025/05/04 11:38:20 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/05/05 15:26:34 by slebik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-void	add_redir_to_cmd(t_command *cmd, t_token *tokens)
-{
-	if (tokens->next && tokens->next->type == TOKEN_WORD)
-		add_redir(cmd, new_redir(tokens->type, tokens->next->value));
-	else
-		printf("\033[0;31mSyntax error: no redirection file\033[0m\n");
-}
 
 static	t_token	*process_token(t_token *tok, t_command **cur)
 {
@@ -37,8 +29,8 @@ static	t_token	*process_token(t_token *tok, t_command **cur)
 			add_redir(*cur, new_redir(tok->type, tok->next->value));
 			return (tok->next->next);
 		}
-		printf("\033[0;31mSyntax error: no redirection file\033[0m\n");
-		return (NULL);
+		g_exit_status = 2;
+		return (printf("Syntax error: no redirection file\n"), NULL);
 	}
 	if (tok->type == TOKEN_PIPE)
 	{
@@ -60,7 +52,8 @@ static bool	check_empty_pipe(t_command *cmds)
 	{
 		if (is_empty_command(cmds))
 		{
-			fprintf(stderr, "Syntax error: empty command\n");
+			g_exit_status = 2;
+			ft_putstr_fd("Syntax error: empty command\n", 2);
 			return (true);
 		}
 		cmds = cmds->next;
@@ -89,10 +82,9 @@ t_command	*lexer(t_token *tokens)
 			break ;
 		tokens = next;
 	}
-	if (check_empty_pipe(head))
-	{
-		free_command(head);
+	if (tokens == NULL)
 		return (NULL);
-	}
+	if (check_empty_pipe(head))
+		return (free_command(head), NULL);
 	return (head);
 }

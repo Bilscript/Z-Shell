@@ -14,54 +14,32 @@
 
 int	g_exit_status = 0;
 
-
-void	print_shell(void)
-{
-	printf("\033[1;34m");
-	printf("██╗    ██╗███████╗██╗      ██████╗ ██████╗ ███╗   ███╗███████╗    ████████╗ ██████╗     ████████╗██╗  ██╗███████╗\n\
-██║    ██║██╔════╝██║     ██╔════╝██╔═══██╗████╗ ████║██╔════╝    ╚══██╔══╝██╔═══██╗    ╚══██╔══╝██║  ██║██╔════╝\n\
-██║ █╗ ██║█████╗  ██║     ██║     ██║   ██║██╔████╔██║█████╗         ██║   ██║   ██║       ██║   ███████║█████╗  \n\
-██║███╗██║██╔══╝  ██║     ██║     ██║   ██║██║╚██╔╝██║██╔══╝         ██║   ██║   ██║       ██║   ██╔══██║██╔══╝  \n\
-╚███╔███╔╝███████╗███████╗╚██████╗╚██████╔╝██║ ╚═╝ ██║███████╗       ██║   ╚██████╔╝       ██║   ██║  ██║███████╗\n\
- ╚══╝╚══╝ ╚══════╝╚══════╝ ╚═════╝ ╚═════╝ ╚═╝     ╚═╝╚══════╝       ╚═╝    ╚═════╝        ╚═╝   ╚═╝  ╚═╝╚══════╝\n\
-");
-	printf("\033[1;31m");
-	printf("                            ███████╗      ███████╗██╗  ██╗███████╗██╗     ██╗\n\
-                            ╚══███╔╝      ██╔════╝██║  ██║██╔════╝██║     ██║\n\
-                              ███╔╝ █████╗███████╗███████║█████╗  ██║     ██║\n\
-                             ███╔╝  ╚════╝╚════██║██╔══██║██╔══╝  ██║     ██║\n\
-                            ███████╗      ███████║██║  ██║███████╗███████╗███████╗\n\
-                            ╚══════╝      ╚══════╝╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝\n");
-	printf("\033[1;36m");
-	printf("                                                			by Bilscript & SLK  |  Z-Corp®\n");
-	printf("\033[1;30m");
-	printf("===================================================================================================================\n");
-	printf("\033[0m");
-}
-
 void	parse_and_execute(char *input, t_envp_list *env_data)
 {
 	t_token		*token;
 	t_command	*command;
+	bool		token_on;
 
+	token_on = false;
 	token = tokenizer(input, env_data->head);
-	//print_tokens(token);
-	command = lexer(token);
-	//print_commands(command);
-	exec(command, env_data, token);
+	if (token->type != TOKEN_EOF)
+	{
+		command = lexer(token);
+		exec(command, env_data, token);
+		token_on = true;
+	}
 	free_tab(env_data->lenv);
 	env_data->lenv = envp_to_array(env_data->head);
 	free_tokens(token);
-	free_command(command);
+	if (token_on == true)
+		free_command(command);
 }
 
-
-int main(int ac, char **av, char **envp)
+int	main(int ac, char **av, char **envp)
 {
 	char		*input;
 	t_envp_list	env_data;
 
-//	print_shell();
 	(void)ac;
 	(void)av;
 	g_exit_status = 0;
@@ -83,9 +61,7 @@ int main(int ac, char **av, char **envp)
 		}
 		free(input);
 	}
-	free_envp_list(&env_data);
-	rl_clear_history();
-	return (0);
+	return (free_envp_list(&env_data), rl_clear_history(), 0);
 }
 
 //MAIN POUR TESTER 
@@ -125,5 +101,4 @@ int	main(int ac, char **av, char **envp)
 	free_envp_list(&env_data);
 	rl_clear_history();
 	return (0);
-}
-*/
+}*/
