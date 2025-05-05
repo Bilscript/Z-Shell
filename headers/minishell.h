@@ -20,17 +20,21 @@
 # include <errno.h>
 # include <readline/readline.h>
 # include <readline/history.h>
-# include "libft.h"
-# include "linux/limits.h"
-# include "limits.h"
-# include <stdbool.h>
-# include <string.h>
 # include <fcntl.h>
 # include <sys/types.h>
 # include <sys/wait.h>
 # include <sys/stat.h>
+# include <stdbool.h>
+# include <string.h>
+# include "libft.h"
+# include "linux/limits.h"
+# include "limits.h"
+
+// ======== Global variable ========
 
 extern int	g_exit_status;
+
+//========** Enums **========
 
 typedef enum e_token_type
 {
@@ -61,6 +65,8 @@ typedef enum e_exit_code
 	EXIT_SIGNAL_INTERRUPT = 130,
 	EXIT_SIGNAL_QUIT = 131,
 }	t_exit_code;
+
+//========** Structures **========
 
 typedef struct s_redir
 {
@@ -116,98 +122,29 @@ typedef struct s_parse_ctx
 	t_quote_status	quote;
 }	t_parse_ctx;
 
-//================TOKEN UTILS================
+//==========** Token functions **==========
 t_token			*tokenizer(char *input, t_envp *envp);
 t_token			*new_token(t_token_type namecode, char *start,
 					size_t len, t_quote_status status);
 t_quote_status	ft_lasttoken_status(t_token *lst);
 void			add_token(t_token **src, t_token *dest);
-void			token_dollar(t_parse_ctx *ctx, t_token **tkn, t_envp *envp,
-					t_quote_status sta);
 int				token_word(char *input, size_t *i, t_token **tokens,
 					t_envp *envp);
-
 size_t			estimate_token_size(char *input, size_t i, t_envp *envp);
+void			free_tokens(t_token *list);
+
+//==========** Parse utilities **==========
+
 int				handle_quotes(t_parse_ctx *ctx, t_envp *envp,
 					t_quote_status *qs);
 int				handle_variable(t_parse_ctx *ctx, t_envp *envp);
 int				handle_special_var(t_parse_ctx *ctx);
 void			handle_quote_content(t_parse_ctx *ctx, t_envp *envp,
 					char quote);
-void			free_tokens(t_token *list);
-void			print_tokens(t_token *list);
 int				ft_isspace(char c);
 int				is_special(char c);
 void			append_to_buf(t_parse_ctx *ctx, const char *str, size_t len);
-void			parse_simple_quote(char *input, size_t *i, t_token **tokens);
-void			parse_double_quote(char *input, size_t *i, t_token **tkn,
-					t_envp *envp);
-char			*get_env_variable(t_envp *env, char *key,
-					t_quote_status status);
 char			*ft_strndup(const char *s, size_t n);
-
-//================LEXER UTILS================
-t_command		*lexer(t_token *tokens);
-t_command		*new_command(void);
-t_redir			*new_redir(int type, const char *filename);
-void			add_arg(t_command *cmd, const char *word);
-void			add_redir(t_command *cmd, t_redir *redir);
-void			print_commands(t_command *cmd_list);
-void			free_command(t_command *cmd);
-void			token_dollar_inside_word(t_parse_ctx *ctx, t_envp *envp);
-
-//================BUILT-IN UTILS================
-void			exec(t_command *cmd_line, t_envp_list *envp, t_token *token);
-void			ft_echo(t_command *cmd);
-void			ft_pwd(void);
-void			ft_cd(t_command *cmd, t_envp *envp);
-void			ft_export(t_command *cmd, t_envp *envp);
-void			ft_unset(t_command *cmd, t_envp *envp);
-int				ft_exit(t_command *cmd);
-t_envp			*new_envp(const char *key, const char *value, bool exprt);
-t_envp			*get_env(char **env);
-void			ft_env(t_command *cmd, t_envp *envp);
-int				len_until_char(const char *str, char c);
-void			add_envp_back(t_envp **head, t_envp *new_node);
-t_envp			*new_envp(const char *key, const char *value, bool exprt);
-char			*get_value(t_envp *envp, char *key);
-char			**envp_to_array(t_envp *envp);
-
-//================EXEC UTILS================
-void			parse_and_execute(char *input, t_envp_list *env_data);
-void			handle_pipeline(char **cmds, t_envp *env);
-void			ft_free_split(char **tab);
-char			*get_path_from_list(t_envp *env_list);
-char			*find_executable(char **chemins, char *cmd);
-char			*parsing(t_envp *env_list, char *cmd);
-void			run_command(t_command *cmd, t_envp_list *env_data);
-void			error(char *error_msg);
-void			errorcmd(const char *cmd, int exit_code);
-char			**env_list_to_array(t_envp *env);
-t_command		*parse_simple_command(char *input);
-void			exec_piped_commands(t_command *cmd, t_envp_list *env_data);
-void			exec_builtin(t_command *cmd, t_envp_list *env_data);
-int				is_builtin(char *cmd);
-
-char			*ft_strjoin_char(char *str, char c);
-int				get_next_line(char **line);
-int				is_valid(const char *str);
-void			here_doc_child(int *fd, char *limiter);
-void			here_doc_parent(int *fd);
-int				handle_here_doc(char *limiter);
-void			write_to_pipe(int fd, char *line);
-void			exec_piped_commands(t_command *cmd, t_envp_list *env_data);
-void			handle_parent(t_command *current, int *in_fd, int *fd);
-void			exec_command_children(t_command *current, t_envp_list *env_data,
-					int in_fd);
-void			prepare_child(t_command *current, int in_fd, int *fd);
-int				prepare_heredocs(t_command *cmd);
-int				handle_input_redir(t_redir *redir);
-int				handle_output_redir(t_redir *redir);
-int				handle_append_redir(t_redir *redir);
-int				handle_heredoc_redir(t_redir *redir);
-int				handle_redirections(t_command *cmd);
-
 void			handle_redir_out(char *input, size_t *i, t_token **tkns);
 void			handle_redir_in(char *input, size_t *i, t_token **tokens);
 void			accolade_gestion(char *input, size_t *i, char **tmp);
@@ -215,21 +152,94 @@ void			get_pid_var(char **value, size_t *i, t_token **tkn,
 					t_quote_status q_st);
 t_parse_ctx		init_parse_ctx(char *input, size_t *i, char *buf, size_t *len);
 int				has_pipe(t_token *tokens);
-void			free_envp_list(t_envp_list *envp_list);
-void			free_tab(char **tab);
 
+// ==========** Lexer functions **==========
+
+t_command		*lexer(t_token *tokens);
+t_command		*new_command(void);
+t_redir			*new_redir(int type, const char *filename);
+void			add_arg(t_command *cmd, const char *word);
+void			add_redir(t_command *cmd, t_redir *redir);
+void			free_command(t_command *cmd);
+void			token_dollar_inside_word(t_parse_ctx *ctx, t_envp *envp);
+
+// ==========** Built-in commands **==========
+
+void			exec(t_command *cmd_line, t_envp_list *envp, t_token *token);
+void			ft_echo(t_command *cmd);
+void			ft_pwd(void);
+void			ft_cd(t_command *cmd, t_envp *envp);
+void			ft_export(t_command *cmd, t_envp *envp);
+void			ft_unset(t_command *cmd, t_envp *envp);
+int				ft_exit(t_command *cmd);
+void			ft_env(t_command *cmd, t_envp *envp);
+int				is_builtin(char *cmd);
+void			exec_builtin(t_command *cmd, t_envp_list *env_data);
+
+// ==========** Environment variables functions **==========
+
+t_envp			*new_envp(const char *key, const char *value, bool exprt);
+t_envp			*get_env(char **env);
+int				len_until_char(const char *str, char c);
+void			add_envp_back(t_envp **head, t_envp *new_node);
+char			*get_value(t_envp *envp, char *key);
+char			**envp_to_array(t_envp *envp);
+void			free_envp_list(t_envp_list *envp_list);
+
+// ==========** Execution functions **==========
+
+void			parse_and_execute(char *input, t_envp_list *env_data);
+void			run_command(t_command *cmd, t_envp_list *env_data);
+void			error(char *error_msg);
+void			exec_piped_commands(t_command *cmd, t_envp_list *env_data);
 void			exec_builtin_or_real(t_command *cmd, t_envp_list *env_data);
-void			save_stdio(t_stdio_backup *backup);
-void			restore_stdio(t_stdio_backup *backup);
-int				has_heredoc(t_command *cmd);
+
+// ==========** Path and command utilities **==========
+
+char			*get_path_from_list(t_envp *env_list);
+char			*find_executable(char **chemins, char *cmd);
+char			*parsing(t_envp *env_list, char *cmd);
 int				check_cmd_path(char **path, t_command *cmd);
-// signalllll
+int				not_directory(char **path, t_command *cmd);
+
+// ==========** Redirection functions **==========
+
+int				prepare_heredocs(t_command *cmd);
+int				handle_input_redir(t_redir *redir);
+int				handle_output_redir(t_redir *redir);
+int				handle_append_redir(t_redir *redir);
+int				handle_heredoc_redir(t_redir *redir);
+int				handle_redirections(t_command *cmd);
+int				handle_here_doc(char *limiter);
+int				has_heredoc(t_command *cmd);
+
+// ==========** Pipe and process functions **==========
+
+void			handle_parent(t_command *current, int *in_fd, int *fd);
+void			exec_command_children(t_command *current, t_envp_list *env_data,
+					int in_fd);
+void			prepare_child(t_command *current, int in_fd, int *fd);
+void			here_doc_child(int *fd, char *limiter);
+void			here_doc_parent(int *fd);
+void			write_to_pipe(int fd, char *line);
+
+// ==========** Signal handlers **==========
+
 void			handle_sigint(int signo);
 void			heredoc_sigint_handler(int signo);
 void			setup_signals(void);
 void			setup_exec_signals(void);
 void			setup_heredoc_signals(void);
 void			reset_signals(void);
-int				not_directory(char **path, t_command *cmd);
+
+// ==========** Utility functions **==========
+
+char			*ft_strjoin_char(char *str, char c);
+int				get_next_line(char **line);
+int				is_valid(const char *str);
+void			ft_free_split(char **tab);
+void			free_tab(char **tab);
+void			save_stdio(t_stdio_backup *backup);
+void			restore_stdio(t_stdio_backup *backup);
 
 #endif

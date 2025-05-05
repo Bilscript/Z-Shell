@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   is_directory.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
+/*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 12:12:16 by slebik            #+#    #+#             */
-/*   Updated: 2025/05/05 14:57:32 by slebik           ###   ########.fr       */
+/*   Updated: 2025/05/06 00:05:15 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ int	not_directory(char **path, t_command *cmd)
 		perror(*path);
 		free(*path);
 		*path = NULL;
-		g_exit_status = 126;
+		g_exit_status = 127;
 		return (0);
 	}
 	if (!S_ISREG(path_stat.st_mode))

@@ -6,7 +6,7 @@
 /*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 14:12:19 by bhamani           #+#    #+#             */
-/*   Updated: 2025/05/04 12:12:36 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/05/05 20:09:17 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ static void	print_env(t_envp *envp)
 	while (temp)
 	{
 		if (temp->export == true)
-			printf("export %s=%s\n", temp->key, temp->value);
+			printf("export %s=\"%s\"\n", temp->key, temp->value);
 		temp = temp->next;
 	}
 	return ;
