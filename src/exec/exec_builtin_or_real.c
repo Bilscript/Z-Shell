@@ -6,7 +6,7 @@
 /*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 16:19:39 by slebik            #+#    #+#             */
-/*   Updated: 2025/05/05 16:41:19 by slebik           ###   ########.fr       */
+/*   Updated: 2025/05/06 11:54:31 by slebik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ static void	exec_forked(t_command *cmd, t_envp_list *env_data)
 		error("fork failed");
 	else if (pid == 0)
 		exec_forked_child(cmd, env_data);
+	g_exit_status = 102;
 	waitpid(pid, &status, 0);
 	handle_signal_status(status);
 }
@@ -58,7 +59,7 @@ void	exec_builtin_or_real(t_command *cmd, t_envp_list *env_data)
 {
 	t_stdio_backup	backup;
 
-	if (!prepare_heredocs(cmd)) // ancienne version "if (!prepare_heredocs(cmd) || g_exit_status == 130)"
+	if (!prepare_heredocs(cmd))
 	{
 		g_exit_status = 130;
 		return ;

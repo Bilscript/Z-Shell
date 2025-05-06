@@ -6,7 +6,7 @@
 /*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 12:06:30 by slebik            #+#    #+#             */
-/*   Updated: 2025/05/05 15:06:27 by slebik           ###   ########.fr       */
+/*   Updated: 2025/05/06 11:36:07 by slebik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,9 @@ int	handle_here_doc(char *limiter)
 	int		fd[2];
 	pid_t	pid;
 	int		status;
+	int		tmp;
 
+	tmp = 0;
 	if (pipe(fd) == -1)
 		error("pipe error");
 	pid = fork();
@@ -54,6 +56,9 @@ int	handle_here_doc(char *limiter)
 	if (pid == 0)
 		here_doc_child(fd, limiter);
 	close(fd[1]);
+	tmp = g_exit_status;
+	g_exit_status = 102;
 	waitpid(pid, &status, 0);
+	g_exit_status = tmp;
 	return (handle_doc_exit(status, fd[0]));
 }

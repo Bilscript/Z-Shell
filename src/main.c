@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
+/*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/14 12:16:43 by bhamani           #+#    #+#             */
-/*   Updated: 2025/04/14 12:16:43 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/05/06 13:26:37 by slebik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,6 @@ int	main(int ac, char **av, char **envp)
 
 	(void)ac;
 	(void)av;
-	g_exit_status = 0;
 	setup_signals();
 	env_data.head = get_env(envp);
 	env_data.lenv = envp_to_array(env_data.head);

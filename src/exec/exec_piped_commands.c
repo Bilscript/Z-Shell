@@ -6,7 +6,7 @@
 /*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 16:13:49 by slebik            #+#    #+#             */
-/*   Updated: 2025/05/05 16:16:05 by slebik           ###   ########.fr       */
+/*   Updated: 2025/05/06 13:26:19 by slebik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,12 +44,16 @@ static void	wait_all_children(void)
 		if (WIFSIGNALED(status))
 		{
 			if (WTERMSIG(status) == SIGINT)
-				g_exit_status = 130;
+			{
+				g_exit_status = 0;
+			}	
 			else if (WTERMSIG(status) == SIGQUIT)
 				g_exit_status = 131;
 		}
 		else
+		{
 			g_exit_status = WEXITSTATUS(status);
+		}
 	}
 }
 
@@ -62,7 +66,7 @@ void	exec_piped_commands(t_command *cmd, t_envp_list *env_data)
 
 	in_fd = 0;
 	cur = cmd;
-	if (!prepare_heredocs(cmd) || g_exit_status == 130)
+	if (!prepare_heredocs(cmd))
 		return ;
 	while (cur)
 	{

@@ -54,8 +54,6 @@ int	prepare_heredocs(t_command *cmd)
 			{
 				if (!process_heredoc(redir))
 					return (0);
-				if (g_exit_status == 130)
-					return (0);
 			}
 			redir = redir->next;
 		}

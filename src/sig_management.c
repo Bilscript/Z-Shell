@@ -6,7 +6,7 @@
 /*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/02 12:25:19 by slebik            #+#    #+#             */
-/*   Updated: 2025/05/05 11:58:30 by slebik           ###   ########.fr       */
+/*   Updated: 2025/05/06 13:23:57 by slebik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,9 +15,18 @@
 void	handle_sigint(int signo)
 {
 	(void)signo;
+	if (g_exit_status == 102)
+	{
+		write(1, "\n", 1);
+	}
+	else
+	{
+		write(1, "\n", 1);
+		rl_on_new_line();
+		rl_replace_line("", 0);
+		rl_redisplay();
+	}
 	g_exit_status = 130;
-	write(1, "\n", 1);
-	write(1, "Z-Shell> ", 9);
 }
 
 void	setup_signals(void)
