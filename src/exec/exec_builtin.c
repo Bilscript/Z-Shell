@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_builtin.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
+/*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 14:04:18 by slebik            #+#    #+#             */
-/*   Updated: 2025/05/05 14:04:21 by slebik           ###   ########.fr       */
+/*   Updated: 2025/05/08 00:38:30 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ int	is_builtin(char *cmd)
 		|| !ft_strcmp(cmd, "exit"));
 }
 
-void	exec_builtin(t_command *cmd, t_envp_list *env_data)
+void	exec_builtin(t_command *cmd, t_envp_list *env_data, t_token *token)
 {
 	prepare_heredocs(cmd);
 	if (!ft_strcmp(cmd->cmd, "echo"))
@@ -41,5 +41,5 @@ void	exec_builtin(t_command *cmd, t_envp_list *env_data)
 	else if (!ft_strcmp(cmd->cmd, "env"))
 		ft_env(cmd, env_data->head);
 	else if (!ft_strcmp(cmd->cmd, "exit"))
-		ft_exit(cmd);
+		ft_exit(cmd, env_data, token);
 }

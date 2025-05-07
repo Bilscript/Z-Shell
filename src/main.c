@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
+/*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/14 12:16:43 by bhamani           #+#    #+#             */
-/*   Updated: 2025/05/06 13:26:37 by slebik           ###   ########.fr       */
+/*   Updated: 2025/05/07 19:57:58 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,9 +28,9 @@ void	parse_and_execute(char *input, t_envp_list *env_data)
 		exec(command, env_data, token);
 		token_on = true;
 	}
+	free_tokens(token);
 	free_tab(env_data->lenv);
 	env_data->lenv = envp_to_array(env_data->head);
-	free_tokens(token);
 	if (token_on == true)
 		free_command(command);
 }

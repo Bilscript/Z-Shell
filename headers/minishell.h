@@ -171,10 +171,12 @@ void			ft_pwd(void);
 void			ft_cd(t_command *cmd, t_envp *envp);
 void			ft_export(t_command *cmd, t_envp *envp);
 void			ft_unset(t_command *cmd, t_envp *envp);
-int				ft_exit(t_command *cmd);
+int				ft_exit(t_command *cmd, t_envp_list *env_data, t_token *token);
 void			ft_env(t_command *cmd, t_envp *envp);
 int				is_builtin(char *cmd);
-void			exec_builtin(t_command *cmd, t_envp_list *env_data);
+void			exec_builtin(t_command *cmd, t_envp_list *env_data,
+					t_token *token);
+void			free_all(t_command *cmd, t_token *token, t_envp_list *env_data);
 
 // ==========** Environment variables functions **==========
 
@@ -189,10 +191,12 @@ void			free_envp_list(t_envp_list *envp_list);
 // ==========** Execution functions **==========
 
 void			parse_and_execute(char *input, t_envp_list *env_data);
-void			run_command(t_command *cmd, t_envp_list *env_data);
+void			run_command(t_command *cmd, t_envp_list *env_data,
+					t_token *token);
 void			error(char *error_msg);
 void			exec_piped_commands(t_command *cmd, t_envp_list *env_data);
-void			exec_builtin_or_real(t_command *cmd, t_envp_list *env_data);
+void			exec_builtin_or_real(t_command *cmd, t_envp_list *env_data,
+					t_token *token);
 
 // ==========** Path and command utilities **==========
 

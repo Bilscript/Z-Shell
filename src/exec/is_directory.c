@@ -6,7 +6,7 @@
 /*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 12:12:16 by slebik            #+#    #+#             */
-/*   Updated: 2025/05/06 00:05:15 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/05/07 20:27:38 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,7 @@ int	check_cmd_path(char **path, t_command *cmd)
 	}
 	if (access(*path, X_OK) == -1)
 	{
+		free_command(cmd);
 		perror(*path);
 		free(*path);
 		*path = NULL;

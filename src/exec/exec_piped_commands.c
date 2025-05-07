@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_piped_commands.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
+/*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 16:13:49 by slebik            #+#    #+#             */
-/*   Updated: 2025/05/06 13:26:19 by slebik           ###   ########.fr       */
+/*   Updated: 2025/05/07 19:35:43 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ static void	wait_all_children(void)
 			if (WTERMSIG(status) == SIGINT)
 			{
 				g_exit_status = 0;
-			}	
+			}
 			else if (WTERMSIG(status) == SIGQUIT)
 				g_exit_status = 131;
 		}

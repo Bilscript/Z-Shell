@@ -52,7 +52,7 @@ void	exec_command_children(t_command *current, t_envp_list *env_data, int fd)
 	(void)fd;
 	if (is_builtin(current->cmd))
 	{
-		exec_builtin(current, env_data);
+		exec_builtin(current, env_data, NULL);
 		exit(g_exit_status);
 	}
 	path = parsing(env_data->head, current->cmd);
@@ -60,6 +60,8 @@ void	exec_command_children(t_command *current, t_envp_list *env_data, int fd)
 	{
 		ft_putstr_fd(current->cmd, 2);
 		ft_putstr_fd(": command not found\n", 2);
+		free_command(current);
+		free_envp_list(env_data);
 		exit(127);
 	}
 	execve(path, current->args, env_data->lenv);

@@ -6,7 +6,7 @@
 /*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/01 12:49:22 by bhamani           #+#    #+#             */
-/*   Updated: 2025/05/04 11:49:15 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/05/08 00:46:58 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,17 +49,29 @@ long long	ft_atoll(const char *str)
 	return (res * sign);
 }
 
-int	ft_exit(t_command *cmd)
+void	free_all(t_command *cmd, t_token *token, t_envp_list *env_data)
+{
+	free_command(cmd);
+	free_tokens(token);
+	free_envp_list(env_data);
+}
+
+
+int	ft_exit(t_command *cmd, t_envp_list *env_data, t_token *token)
 {
 	long long		num;
 	unsigned char	ret;
 
 	printf("exit\n");
 	if (!cmd->args[1])
+	{
+		free_all(cmd, token, env_data);
 		exit(EXIT_SUCCESS);
+	}
 	if (!is_numeric(cmd->args[1]))
 	{
 		print_exit_error(cmd->args[1]);
+		free_all(cmd, token, env_data);
 		exit(EXIT_BUILTIN_ERROR);
 	}
 	if (cmd->args[2])
@@ -70,5 +82,6 @@ int	ft_exit(t_command *cmd)
 	}
 	num = ft_atoll(cmd->args[1]);
 	ret = (unsigned char)(num % 256);
+	free_all(cmd, token, env_data);
 	exit(ret);
 }
