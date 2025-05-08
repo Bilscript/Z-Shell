@@ -6,7 +6,7 @@
 /*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 13:38:30 by bhamani           #+#    #+#             */
-/*   Updated: 2025/05/07 20:45:30 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/05/08 11:50:58 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 void	exec(t_command *cmd_line, t_envp_list *env_data, t_token *token)
 {
 	if (has_pipe(token))
-		exec_piped_commands(cmd_line, env_data);
+		exec_piped_commands(cmd_line, env_data, token);
 	else
 	{
 		while (cmd_line)
@@ -49,6 +49,7 @@ static int	fork_and_exec(char *path, t_command *cmd, t_envp_list *env_data,
 		free(path);
 		exit(126);
 	}
+	printf("debug\n\n\n");
 	waitpid(pid, &status, 0);
 	if (WIFEXITED(status))
 		g_exit_status = WEXITSTATUS(status);

@@ -45,7 +45,7 @@ void	prepare_child(t_command *current, int in_fd, int *fd)
 		exit(1);
 }
 
-void	exec_command_children(t_command *current, t_envp_list *env_data, int fd)
+void	exec_command_children(t_command *current, t_envp_list *env_data, int fd, t_token *token)
 {
 	char	*path;
 
@@ -58,13 +58,16 @@ void	exec_command_children(t_command *current, t_envp_list *env_data, int fd)
 	path = parsing(env_data->head, current->cmd);
 	if (!path)
 	{
+		printf("salutDSQDSQFQQ\n\n");
 		ft_putstr_fd(current->cmd, 2);
 		ft_putstr_fd(": command not found\n", 2);
+		free_tokens(token);
 		free_command(current);
 		free_envp_list(env_data);
 		exit(127);
 	}
 	execve(path, current->args, env_data->lenv);
+	printf("debuuuug\n\n");
 	perror("execve failed");
 	free(path);
 	exit(1);

@@ -194,7 +194,7 @@ void			parse_and_execute(char *input, t_envp_list *env_data);
 void			run_command(t_command *cmd, t_envp_list *env_data,
 					t_token *token);
 void			error(char *error_msg);
-void			exec_piped_commands(t_command *cmd, t_envp_list *env_data);
+void			exec_piped_commands(t_command *cmd, t_envp_list *env_data, t_token *token);
 void			exec_builtin_or_real(t_command *cmd, t_envp_list *env_data,
 					t_token *token);
 
@@ -221,7 +221,7 @@ int				has_heredoc(t_command *cmd);
 
 void			handle_parent(t_command *current, int *in_fd, int *fd);
 void			exec_command_children(t_command *current, t_envp_list *env_data,
-					int in_fd);
+					int in_fd, t_token *token);
 void			prepare_child(t_command *current, int in_fd, int *fd);
 void			here_doc_child(int *fd, char *limiter);
 void			here_doc_parent(int *fd);

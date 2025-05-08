@@ -6,14 +6,14 @@
 /*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 16:13:49 by slebik            #+#    #+#             */
-/*   Updated: 2025/05/07 19:35:43 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/05/08 11:51:47 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 static void	handle_child(t_command *cmd, t_envp_list *env_data,
-		int *fd, int in_fd)
+		int *fd, int in_fd, t_token *token)
 {
 	setup_exec_signals();
 	if (cmd->next)
@@ -32,7 +32,7 @@ static void	handle_child(t_command *cmd, t_envp_list *env_data,
 		if (handle_redirections(cmd) == -1)
 			exit(1);
 	}
-	exec_command_children(cmd, env_data, in_fd);
+	exec_command_children(cmd, env_data, in_fd, token);
 }
 
 static void	wait_all_children(void)
@@ -57,7 +57,7 @@ static void	wait_all_children(void)
 	}
 }
 
-void	exec_piped_commands(t_command *cmd, t_envp_list *env_data)
+void	exec_piped_commands(t_command *cmd, t_envp_list *env_data, t_token *token)
 {
 	int			fd[2];
 	int			in_fd;
@@ -74,7 +74,7 @@ void	exec_piped_commands(t_command *cmd, t_envp_list *env_data)
 			error("pipe failed");
 		pid = fork();
 		if (pid == 0)
-			handle_child(cur, env_data, fd, in_fd);
+			handle_child(cur, env_data, fd, in_fd, token);
 		else if (pid < 0)
 			error("fork failed");
 		handle_parent(cur, &in_fd, fd);
