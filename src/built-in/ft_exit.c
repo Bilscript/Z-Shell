@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_exit.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
+/*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/01 12:49:22 by bhamani           #+#    #+#             */
-/*   Updated: 2025/05/08 00:46:58 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/05/08 19:17:44 by slebik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,15 +49,24 @@ long long	ft_atoll(const char *str)
 	return (res * sign);
 }
 
-void	free_all(t_command *cmd, t_token *token, t_envp_list *env_data)
+void	free_all(t_command *cmd, t_data *data)
 {
-	free_command(cmd);
-	free_tokens(token);
-	free_envp_list(env_data);
+	if (data)
+	{
+		if (data->cmd)
+			free_command(data->cmd);
+		if (data->token)
+			free_tokens(data->token);
+		free_envp_list(&(data->env_data));
+		free(data);
+	}
+	if (cmd)
+		free_command(cmd);
 }
 
 
-int	ft_exit(t_command *cmd, t_envp_list *env_data, t_token *token)
+
+int	ft_exit(t_command *cmd, t_data *data)
 {
 	long long		num;
 	unsigned char	ret;
@@ -65,13 +74,13 @@ int	ft_exit(t_command *cmd, t_envp_list *env_data, t_token *token)
 	printf("exit\n");
 	if (!cmd->args[1])
 	{
-		free_all(cmd, token, env_data);
+		free_all(NULL, data);
 		exit(EXIT_SUCCESS);
 	}
 	if (!is_numeric(cmd->args[1]))
 	{
 		print_exit_error(cmd->args[1]);
-		free_all(cmd, token, env_data);
+		free_all(NULL, data);
 		exit(EXIT_BUILTIN_ERROR);
 	}
 	if (cmd->args[2])
@@ -82,6 +91,6 @@ int	ft_exit(t_command *cmd, t_envp_list *env_data, t_token *token)
 	}
 	num = ft_atoll(cmd->args[1]);
 	ret = (unsigned char)(num % 256);
-	free_all(cmd, token, env_data);
+	free_all(NULL, data);
 	exit(ret);
 }

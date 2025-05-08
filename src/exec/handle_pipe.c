@@ -45,29 +45,27 @@ void	prepare_child(t_command *current, int in_fd, int *fd)
 		exit(1);
 }
 
-void	exec_command_children(t_command *current, t_envp_list *env_data, int fd, t_token *token)
+void	exec_command_children(t_command *current, int fd, t_data *data)
 {
 	char	*path;
 
 	(void)fd;
 	if (is_builtin(current->cmd))
 	{
-		exec_builtin(current, env_data, NULL);
+		exec_builtin(current, data);
 		exit(g_exit_status);
 	}
-	path = parsing(env_data->head, current->cmd);
+	path = parsing(data->env_data.head, current->cmd);
 	if (!path)
 	{
-		printf("salutDSQDSQFQQ\n\n");
 		ft_putstr_fd(current->cmd, 2);
 		ft_putstr_fd(": command not found\n", 2);
-		free_tokens(token);
+		free_tokens(data->token);
 		free_command(current);
-		free_envp_list(env_data);
+		free_envp_list(&(data->env_data));
 		exit(127);
 	}
-	execve(path, current->args, env_data->lenv);
-	printf("debuuuug\n\n");
+	execve(path, current->args, data->env_data.lenv);
 	perror("execve failed");
 	free(path);
 	exit(1);

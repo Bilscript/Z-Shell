@@ -6,7 +6,7 @@
 /*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 12:06:30 by slebik            #+#    #+#             */
-/*   Updated: 2025/05/06 11:36:07 by slebik           ###   ########.fr       */
+/*   Updated: 2025/05/08 17:41:03 by slebik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ static int	handle_doc_exit(int status, int fd)
 	return (fd);
 }
 
-int	handle_here_doc(char *limiter)
+int	handle_here_doc(char *limiter, t_data *data)
 {
 	int		fd[2];
 	pid_t	pid;
@@ -54,7 +54,7 @@ int	handle_here_doc(char *limiter)
 		error("fork error");
 	}
 	if (pid == 0)
-		here_doc_child(fd, limiter);
+		here_doc_child(fd, limiter, data);
 	close(fd[1]);
 	tmp = g_exit_status;
 	g_exit_status = 102;
