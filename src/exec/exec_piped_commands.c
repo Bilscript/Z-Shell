@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_piped_commands.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
+/*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 16:13:49 by slebik            #+#    #+#             */
-/*   Updated: 2025/05/08 17:39:33 by slebik           ###   ########.fr       */
+/*   Updated: 2025/05/09 10:53:35 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,12 +24,16 @@ static void	handle_child(t_command *curr, int *fd, int in_fd, t_data *data)
 			if (dup2(in_fd, STDIN_FILENO) == -1)
 			{
 				perror("dup2 stdin");
+				free_all(NULL, data);
 				exit(1);
 			}
 			close(in_fd);
 		}
 		if (handle_redirections(curr) == -1)
+		{
+			free_all(NULL, data);
 			exit(1);
+		}
 	}
 	exec_command_children(curr, in_fd, data);
 }
@@ -66,16 +70,28 @@ void	exec_piped_commands(t_data *data)
 	in_fd = 0;
 	cur = data->cmd;
 	if (!prepare_heredocs(data))
+	{
+		free_command(data->cmd);
+		data->cmd = NULL;
 		return ;
+	}
 	while (cur)
 	{
 		if (cur->next && pipe(fd) == -1)
+		{
+			free_command(data->cmd);
+			data->cmd = NULL;
 			error("pipe failed");
+		}
 		pid = fork();
 		if (pid == 0)
-			handle_child(cur,fd, in_fd, data);
+			handle_child(cur, fd, in_fd, data);
 		else if (pid < 0)
+		{
+			free_command(data->cmd);
+			data->cmd = NULL;
 			error("fork failed");
+		}
 		handle_parent(cur, &in_fd, fd);
 		cur = cur->next;
 	}

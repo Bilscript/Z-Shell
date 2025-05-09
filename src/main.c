@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
+/*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/14 12:16:43 by bhamani           #+#    #+#             */
-/*   Updated: 2025/05/08 19:33:36 by slebik           ###   ########.fr       */
+/*   Updated: 2025/05/09 10:23:45 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,22 +17,40 @@ int	g_exit_status = 0;
 void	parse_and_execute(char *input, t_data *data)
 {
 	bool		token_on;
+	t_command	*cmd_save;
 
 	token_on = false;
+	cmd_save = NULL;
 	data->token = tokenizer(input, data->env_data.head);
 	if (data->token == NULL)
-		return ; // potentiel leak free data ici
+	{
+		free_command(data->cmd);
+		data->cmd = NULL;
+		return ;
+	}
 	if (data->token->type != TOKEN_EOF)
 	{
+		cmd_save = data->cmd;
 		data->cmd = lexer(data->token);
+		if (!data->cmd)
+		{
+			free_tokens(data->token);
+			data->token = NULL;
+			return ;
+		}
 		exec(data);
 		token_on = true;
 	}
-	free_tokens(data->token);
-	free_tab(data->env_data.lenv);
+	if (data->token)
+		free_tokens(data->token);
+	if (data->env_data.lenv)
+		free_tab(data->env_data.lenv);
 	data->env_data.lenv = envp_to_array(data->env_data.head);
 	if (token_on == true)
+	{
 		free_command(data->cmd);
+		data->cmd = cmd_save;
+	}
 }
 
 t_data	*init_data(char **envp)
@@ -45,7 +63,18 @@ t_data	*init_data(char **envp)
 	data->cmd = NULL;
 	data->token = NULL;
 	data->env_data.head = get_env(envp);
+	if (!data->env_data.head)
+	{
+		free(data);
+		return (NULL);
+	}
 	data->env_data.lenv = envp_to_array(data->env_data.head);
+	if (!data->env_data.lenv)
+	{
+		free_envp_list(&data->env_data);
+		free(data);
+		return (NULL);
+	}
 	return (data);
 }
 
@@ -77,7 +106,8 @@ int	main(int ac, char **av, char **envp)
 	}
 	free_envp_list(&data->env_data);
 	rl_clear_history();
-	free_all(NULL, data);
+	free_command(data->cmd);
+	free(data);
 	return (0);
 }
 

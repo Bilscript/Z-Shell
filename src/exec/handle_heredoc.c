@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   handle_heredoc.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
+/*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 14:04:04 by slebik            #+#    #+#             */
-/*   Updated: 2025/05/05 14:04:04 by slebik           ###   ########.fr       */
+/*   Updated: 2025/05/09 14:30:48 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,6 +76,7 @@ void	here_doc_child(int *fd, char *limiter, t_data *data)
 
 	setup_heredoc_signals();
 	close(fd[0]);
+	//free_all(NULL, data);
 	while (1)
 	{
 		line = readline("> ");

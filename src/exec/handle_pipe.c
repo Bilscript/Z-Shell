@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   handle_pipe.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
+/*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 14:03:52 by slebik            #+#    #+#             */
-/*   Updated: 2025/05/05 14:03:52 by slebik           ###   ########.fr       */
+/*   Updated: 2025/05/09 10:31:54 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,9 +60,8 @@ void	exec_command_children(t_command *current, int fd, t_data *data)
 	{
 		ft_putstr_fd(current->cmd, 2);
 		ft_putstr_fd(": command not found\n", 2);
-		free_tokens(data->token);
 		free_command(current);
-		free_envp_list(&(data->env_data));
+		free_all(NULL, data);
 		exit(127);
 	}
 	execve(path, current->args, data->env_data.lenv);

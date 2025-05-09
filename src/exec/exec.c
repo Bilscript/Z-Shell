@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
+/*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 13:38:30 by bhamani           #+#    #+#             */
-/*   Updated: 2025/05/08 19:27:00 by slebik           ###   ########.fr       */
+/*   Updated: 2025/05/09 15:48:28 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,17 +14,20 @@
 
 void	exec(t_data *data)
 {
+	t_command	*current;
+	t_command	*next;
+
 	if (has_pipe(data->token))
 		exec_piped_commands(data);
 	else
 	{
-		while (data->cmd)
+		current = data->cmd;
+		while (current)
 		{
-			if (data->cmd->cmd)
-			{
+			next = current->next;
+			if (current->cmd)
 				exec_builtin_or_real(data);
-			}
-			data->cmd = data->cmd->next;
+			current = next;
 		}
 	}
 }
@@ -52,7 +55,7 @@ static int	fork_and_exec(char *path, t_data *data)
 	waitpid(pid, &status, 0);
 	if (WIFEXITED(status))
 		g_exit_status = WEXITSTATUS(status);
-	//free_tokens(data->token);  nrml c gerer apres 
+	free(path);
 	return (0);
 }
 
@@ -64,13 +67,10 @@ void	run_command(t_data *data)
 		return ;
 	path = parsing(data->env_data.head, data->cmd->cmd);
 	if (!check_cmd_path(&path, data->cmd))
-	{
-		free_tokens(data->token);
 		return ;
-	}
 	if (fork_and_exec(path, data))
 	{
+		free_all(NULL, data);
 		return ;
 	}
-	free(path);
 }
