@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   handle_pipe.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
+/*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 14:03:52 by slebik            #+#    #+#             */
-/*   Updated: 2025/05/09 10:31:54 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/05/09 16:31:02 by slebik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ void	exec_command_children(t_command *current, int fd, t_data *data)
 	{
 		ft_putstr_fd(current->cmd, 2);
 		ft_putstr_fd(": command not found\n", 2);
-		free_command(current);
+		//free_command(current);
 		free_all(NULL, data);
 		exit(127);
 	}

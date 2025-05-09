@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_builtin_or_real.c                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
+/*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 16:19:39 by slebik            #+#    #+#             */
-/*   Updated: 2025/05/09 10:17:29 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/05/09 20:43:01 by slebik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,11 @@ static void	handle_signal_status(int status)
 	if (WIFSIGNALED(status))
 	{
 		if (WTERMSIG(status) == SIGINT)
+		{
+			printf("pepeleeeeeeeew\n");
+			free_all(NULL,data);
 			g_exit_status = 130;
+		}
 		else if (WTERMSIG(status) == SIGQUIT)
 		{
 			g_exit_status = 131;
