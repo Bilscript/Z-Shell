@@ -6,7 +6,7 @@
 /*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/14 12:16:43 by bhamani           #+#    #+#             */
-/*   Updated: 2025/05/09 10:23:45 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/05/10 14:36:36 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,10 @@
 
 int	g_exit_status = 0;
 
-void	parse_and_execute(char *input, t_data *data)
+void parse_and_execute(char *input, t_data *data)
 {
-	bool		token_on;
-	t_command	*cmd_save;
+	bool token_on;
+	t_command *cmd_save;
 
 	token_on = false;
 	cmd_save = NULL;
@@ -26,7 +26,7 @@ void	parse_and_execute(char *input, t_data *data)
 	{
 		free_command(data->cmd);
 		data->cmd = NULL;
-		return ;
+		return;
 	}
 	if (data->token->type != TOKEN_EOF)
 	{
@@ -36,7 +36,7 @@ void	parse_and_execute(char *input, t_data *data)
 		{
 			free_tokens(data->token);
 			data->token = NULL;
-			return ;
+			return;
 		}
 		exec(data);
 		token_on = true;
@@ -52,6 +52,7 @@ void	parse_and_execute(char *input, t_data *data)
 		data->cmd = cmd_save;
 	}
 }
+
 
 t_data	*init_data(char **envp)
 {
@@ -78,10 +79,10 @@ t_data	*init_data(char **envp)
 	return (data);
 }
 
-int	main(int ac, char **av, char **envp) 
+int main(int ac, char **av, char **envp)
 {
-	char	*input;
-	t_data	*data;
+	char *input;
+	t_data *data;
 
 	(void)ac;
 	(void)av;
@@ -107,9 +108,14 @@ int	main(int ac, char **av, char **envp)
 	free_envp_list(&data->env_data);
 	rl_clear_history();
 	free_command(data->cmd);
+	if (data->token)
+	{
+		free_tokens(data->token);
+	}	
 	free(data);
 	return (0);
 }
+
 
 //MAIN POUR TESTER 
 /*

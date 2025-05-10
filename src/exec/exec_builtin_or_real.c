@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   exec_builtin_or_real.c                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
+/*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 16:19:39 by slebik            #+#    #+#             */
-/*   Updated: 2025/05/09 20:43:01 by slebik           ###   ########.fr       */
+/*   Updated: 2025/05/09 23:28:06 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static void	exec_forked_child(t_data *data)
+static void exec_forked_child(t_data *data)
 {
 	setup_exec_signals();
 	if (handle_redirections(data->cmd) == -1)
@@ -35,7 +35,6 @@ static void	handle_signal_status(int status)
 		if (WTERMSIG(status) == SIGINT)
 		{
 			printf("pepeleeeeeeeew\n");
-			free_all(NULL,data);
 			g_exit_status = 130;
 		}
 		else if (WTERMSIG(status) == SIGQUIT)
@@ -48,7 +47,7 @@ static void	handle_signal_status(int status)
 		g_exit_status = WEXITSTATUS(status);
 }
 
-static void	exec_forked(t_data *data)
+static void exec_forked(t_data *data)
 {
 	pid_t	pid;
 	int		status;
@@ -58,12 +57,13 @@ static void	exec_forked(t_data *data)
 		error("fork failed");
 	else if (pid == 0)
 		exec_forked_child(data);
+
 	g_exit_status = 102;
 	waitpid(pid, &status, 0);
 	handle_signal_status(status);
 }
 
-void	exec_builtin_or_real(t_data *data)
+void exec_builtin_or_real(t_data *data)
 {
 	t_stdio_backup	backup;
 
@@ -87,3 +87,4 @@ void	exec_builtin_or_real(t_data *data)
 		exec_forked(data);
 	setup_signals();
 }
+

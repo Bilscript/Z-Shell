@@ -6,12 +6,12 @@
 /*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 16:13:49 by slebik            #+#    #+#             */
-/*   Updated: 2025/05/09 10:53:35 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/05/10 14:39:46 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
+/*
 static void	handle_child(t_command *curr, int *fd, int in_fd, t_data *data)
 {
 	setup_exec_signals();
@@ -59,42 +59,68 @@ static void	wait_all_children(void)
 		}
 	}
 }
+*/
+#include <signal.h>
 
 void	exec_piped_commands(t_data *data)
 {
-	int			fd[2];
-	int			in_fd;
-	pid_t		pid;
-	t_command	*cur;
+	t_command			*current = data->cmd;
+	int					in_fd = 0;
+	int					fd[2];
+	pid_t				pid;
+	pid_t				last_pid = -1;
+	struct sigaction	old_int, old_quit, ignore;
+	int					status;
 
-	in_fd = 0;
-	cur = data->cmd;
-	if (!prepare_heredocs(data))
+	// Ignorer SIGINT et SIGQUIT dans le parent
+	ignore.sa_handler = SIG_IGN;
+	sigemptyset(&ignore.sa_mask);
+	ignore.sa_flags = 0;
+	sigaction(SIGINT, NULL, &old_int);
+	sigaction(SIGQUIT, NULL, &old_quit);
+	sigaction(SIGINT, &ignore, NULL);
+	sigaction(SIGQUIT, &ignore, NULL);
+	(void)last_pid;
+	while (current)
 	{
-		free_command(data->cmd);
-		data->cmd = NULL;
-		return ;
-	}
-	while (cur)
-	{
-		if (cur->next && pipe(fd) == -1)
+		if (current->next && pipe(fd) == -1)
 		{
-			free_command(data->cmd);
-			data->cmd = NULL;
-			error("pipe failed");
+			perror("pipe failed");
+			return ;
 		}
 		pid = fork();
-		if (pid == 0)
-			handle_child(cur, fd, in_fd, data);
-		else if (pid < 0)
+		if (pid < 0)
 		{
-			free_command(data->cmd);
-			data->cmd = NULL;
-			error("fork failed");
+			perror("fork failed");
+			return ;
 		}
-		handle_parent(cur, &in_fd, fd);
-		cur = cur->next;
+		if (pid == 0)
+		{
+			signal(SIGINT, SIG_DFL);
+			signal(SIGQUIT, SIG_DFL);
+			prepare_child(current, in_fd, fd);
+			exec_command_children(current, fd[1], data);
+		}
+		else
+		{
+			last_pid = pid;
+			handle_parent(current, &in_fd, fd);
+			current = current->next;
+		}
 	}
-	wait_all_children();
-	setup_signals();
+	
+	// Attendre tous les enfants
+	while (wait(&status) > 0)
+		;
+
+	// Restaurer les signaux
+	sigaction(SIGINT, &old_int, NULL);
+	sigaction(SIGQUIT, &old_quit, NULL);
+
+	// Mise à jour du statut de sortie
+	if (WIFEXITED(status))
+		g_exit_status = WEXITSTATUS(status);
+	else if (WIFSIGNALED(status))
+		g_exit_status = 128 + WTERMSIG(status);
 }
+
