@@ -21,8 +21,7 @@ int	handle_variable(t_parse_ctx *ctx, t_envp *envp)
 	if (ctx->input[*ctx->i + 1] == '?')
 		return (handle_special_var(ctx));
 	(*ctx->i)++;
-	if (!ctx->input[*ctx->i] || (!ft_isalnum(ctx->input[*ctx->i])
-			&& ctx->input[*ctx->i] != '_'))
+	if (!ctx->input[*ctx->i])
 		return (ctx->buf[(*ctx->len)++] = '$', 1);
 	start = *ctx->i;
 	while (ft_isalnum(ctx->input[*ctx->i]) || ctx->input[*ctx->i] == '_')
@@ -31,9 +30,11 @@ int	handle_variable(t_parse_ctx *ctx, t_envp *envp)
 	if (!key)
 		return (0);
 	val = get_value(envp, key);
-	free(key);
 	if (val)
 		append_to_buf(ctx, val, ft_strlen(val));
+	else if (ft_isdigit(key[0]))
+		append_to_buf(ctx, key + 1, ft_strlen(key) - 1);
+	free(key);
 	return (1);
 }
 

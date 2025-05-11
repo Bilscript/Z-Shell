@@ -6,7 +6,7 @@
 /*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 12:14:09 by slebik            #+#    #+#             */
-/*   Updated: 2025/05/04 12:05:19 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/05/11 18:20:20 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,6 @@ size_t	handle_dollar(char *input, size_t *i, t_envp *envp)
 	size_t	j;
 	char	*key;
 	char	*val;
-	size_t	len;
 
 	if (input[*i + 1] == '?')
 	{
@@ -91,13 +90,18 @@ size_t	handle_dollar(char *input, size_t *i, t_envp *envp)
 	while (ft_isalnum(input[j]) || input[j] == '_')
 		j++;
 	key = ft_strndup(input + *i + 1, j - (*i + 1));
+	if (!key)
+		return (0);
 	val = get_value(envp, key);
-	len = 0;
-	if (val)
-		len = ft_strlen(val);
-	free(key);
 	*i = j;
-	return (len);
+	if (val)
+		j = ft_strlen(val);
+	else if (ft_isdigit(key[0]))
+		j = ft_strlen(key + 1);
+	else
+		j = 0;
+	free(key);
+	return (j);
 }
 
 size_t	estimate_token_size(char *input, size_t i, t_envp *envp)
