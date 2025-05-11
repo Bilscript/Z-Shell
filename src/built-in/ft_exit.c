@@ -6,7 +6,7 @@
 /*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/01 12:49:22 by bhamani           #+#    #+#             */
-/*   Updated: 2025/05/09 10:03:50 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/05/11 13:55:36 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,23 +51,22 @@ long long	ft_atoll(const char *str)
 
 void	free_all(t_command *cmd, t_data *data)
 {
-	if (data != NULL)
+	if (data)
 	{
-		if (data->cmd != NULL)
+		if (data->cmd)
 		{
 			free_command(data->cmd);
 			data->cmd = NULL;
 		}
-		if (data->token != NULL)
+		if (data->token)
 		{
 			free_tokens(data->token);
 			data->token = NULL;
 		}
 		free_envp_list(&(data->env_data));
 		free(data);
-		data = NULL;
 	}
-	if (cmd != NULL)
+	if (cmd)
 	{
 		free_command(cmd);
 		cmd = NULL;

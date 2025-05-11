@@ -6,7 +6,7 @@
 /*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 13:38:30 by bhamani           #+#    #+#             */
-/*   Updated: 2025/05/10 14:26:14 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/05/11 13:43:48 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,24 +33,22 @@ void exec(t_data *data)
 }
 
 
-#include <signal.h>
-
 static int	fork_and_exec(char *path, t_data *data)
 {
-	pid_t	pid;
-	int		status;
-	struct sigaction	sa_int_old;
-	struct sigaction	sa_quit_old;
+	pid_t				pid;
+	int					status;
+	struct sigaction	sa_old_int;
+	struct sigaction	sa_old_quit;
 	struct sigaction	sa_ignore;
 
-	// Préparer une action ignorée
+	// Préparer struct pour ignorer SIGINT/SIGQUIT dans le parent
 	sa_ignore.sa_handler = SIG_IGN;
 	sigemptyset(&sa_ignore.sa_mask);
 	sa_ignore.sa_flags = 0;
 
-	// Sauvegarder les signaux actuels et ignorer SIGINT/SIGQUIT dans le parent
-	sigaction(SIGINT, NULL, &sa_int_old);
-	sigaction(SIGQUIT, NULL, &sa_quit_old);
+	// Sauvegarder et remplacer temporairement les signaux
+	sigaction(SIGINT, NULL, &sa_old_int);
+	sigaction(SIGQUIT, NULL, &sa_old_quit);
 	sigaction(SIGINT, &sa_ignore, NULL);
 	sigaction(SIGQUIT, &sa_ignore, NULL);
 
@@ -64,7 +62,7 @@ static int	fork_and_exec(char *path, t_data *data)
 	}
 	if (pid == 0)
 	{
-		// Restaure les signaux défauts dans le fork
+		// Restaure comportements défaut dans le fork (CTRL+C, CTRL+\)
 		signal(SIGINT, SIG_DFL);
 		signal(SIGQUIT, SIG_DFL);
 		execve(path, data->cmd->args, data->env_data.lenv);
@@ -73,38 +71,46 @@ static int	fork_and_exec(char *path, t_data *data)
 		exit(126);
 	}
 
+	// Parent attend le fils
 	waitpid(pid, &status, 0);
 
-	// Restauration des signaux par défaut dans le parent
-	sigaction(SIGINT, &sa_int_old, NULL);
-	sigaction(SIGQUIT, &sa_quit_old, NULL);
+	// Restaure signaux initiaux
+	sigaction(SIGINT, &sa_old_int, NULL);
+	sigaction(SIGQUIT, &sa_old_quit, NULL);
 
 	free(path);
 
+	// Met à jour le code de retour
 	if (WIFEXITED(status))
 		g_exit_status = WEXITSTATUS(status);
 	else if (WIFSIGNALED(status))
-		g_exit_status = 128 + WTERMSIG(status);  // Ex. 130 pour Ctrl+C
+		g_exit_status = 128 + WTERMSIG(status);
 
 	return (0);
 }
 
-
 void run_command(t_data *data)
 {
-	char	*path;
+	char *path;
 
 	if (!data->cmd || !data->cmd->cmd)
-		return ;
+		exit(0); // Rien à exécuter, on quitte proprement
+
 	path = parsing(data->env_data.head, data->cmd->cmd);
 	if (!check_cmd_path(&path, data->cmd))
 	{
-		free(path);
-		return ;
+		// On affiche l'erreur et on quitte sans double free
+		ft_putstr_fd(data->cmd->cmd, 2);
+		ft_putstr_fd(": command not found\n", 2);
+		free(path); // important : path est alloué
+		exit(127);
 	}
+
+	// Fork + execve
 	if (fork_and_exec(path, data))
-	{
-		free_all(NULL, data);
-		return ;
-	}
+		exit(g_exit_status); // fork_and_exec a déjà free(path)
+
+	exit(g_exit_status);
 }
+
+

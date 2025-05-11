@@ -6,25 +6,30 @@
 /*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 16:19:39 by slebik            #+#    #+#             */
-/*   Updated: 2025/05/09 23:28:06 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/05/11 15:25:59 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+void	free_child_data(t_data *data)
+{
+	if (data->token)
+		free_tokens(data->token);
+	if (data->env_data.lenv)
+		free_tab(data->env_data.lenv);
+}
+
 static void exec_forked_child(t_data *data)
 {
 	setup_exec_signals();
 	if (handle_redirections(data->cmd) == -1)
-	{
-		free_all(NULL, data);
 		exit(1);
-	}
 	if (is_builtin(data->cmd->cmd))
 		exec_builtin(data->cmd, data);
 	else
 		run_command(data);
-	free_all(NULL, data);
+	free_child_data(data);
 	exit(g_exit_status);
 }
 
@@ -33,10 +38,7 @@ static void	handle_signal_status(int status)
 	if (WIFSIGNALED(status))
 	{
 		if (WTERMSIG(status) == SIGINT)
-		{
-			printf("pepeleeeeeeeew\n");
 			g_exit_status = 130;
-		}
 		else if (WTERMSIG(status) == SIGQUIT)
 		{
 			g_exit_status = 131;
@@ -57,7 +59,6 @@ static void exec_forked(t_data *data)
 		error("fork failed");
 	else if (pid == 0)
 		exec_forked_child(data);
-
 	g_exit_status = 102;
 	waitpid(pid, &status, 0);
 	handle_signal_status(status);
@@ -87,4 +88,3 @@ void exec_builtin_or_real(t_data *data)
 		exec_forked(data);
 	setup_signals();
 }
-
