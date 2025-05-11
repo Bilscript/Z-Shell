@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   is_directory.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
+/*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 12:12:16 by slebik            #+#    #+#             */
-/*   Updated: 2025/05/08 19:10:45 by slebik           ###   ########.fr       */
+/*   Updated: 2025/05/11 15:44:43 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,14 +26,14 @@ int	not_directory(char **path, t_command *cmd)
 	}
 	if (!S_ISREG(path_stat.st_mode))
 	{
-	    ft_putstr_fd("bash: ", 2);
-	    ft_putstr_fd(cmd->args[0], 2);
-	    ft_putstr_fd(": Is a directory\n", 2);
-	    if (*path != cmd->args[0])
-	        free(*path);
-	    *path = NULL;
-	    g_exit_status = 126;
-	    return (0);
+		ft_putstr_fd("bash: ", 2);
+		ft_putstr_fd(cmd->args[0], 2);
+		ft_putstr_fd(": Is a directory\n", 2);
+		if (*path != cmd->args[0])
+			free(*path);
+		*path = NULL;
+		g_exit_status = 126;
+		return (0);
 	}
 	return (1);
 }
@@ -58,8 +58,6 @@ int	check_cmd_path(char **path, t_command *cmd)
 	{
 		free_command(cmd);
 		perror(*path);
-		free(*path);
-		*path = NULL;
 		g_exit_status = 126;
 		return (0);
 	}
