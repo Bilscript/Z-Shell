@@ -6,7 +6,7 @@
 /*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 12:14:09 by slebik            #+#    #+#             */
-/*   Updated: 2025/05/11 18:20:20 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/05/11 19:44:54 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,12 @@ size_t	handle_dollar_double_quote(char *input, size_t *i, t_envp *envp)
 
 	len = 0;
 	j = *i + 1;
-	while (ft_isalnum(input[j]) || input[j] == '_')
+	if (input[j] == '\0' || input[j] == '"')
+	{
+		(*i)++;
+		return (1);
+	}
+	while (input[j] && (ft_isalnum(input[j]) || input[j] == '_'))
 		j++;
 	key = ft_strndup(input + *i + 1, j - (*i + 1));
 	val = get_value(envp, key);

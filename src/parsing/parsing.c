@@ -18,14 +18,18 @@ int	handle_variable(t_parse_ctx *ctx, t_envp *envp)
 	char	*key;
 	char	*val;
 
+	if (!ctx->input[*ctx->i + 1])
+		return (ctx->buf[(*ctx->len)++] = '$', (*ctx->i)++, 1);
+	if (ctx->input[*ctx->i + 1] == '"')
+		return (ctx->buf[(*ctx->len)++] = '$', (*ctx->i)++, 1);
 	if (ctx->input[*ctx->i + 1] == '?')
 		return (handle_special_var(ctx));
 	(*ctx->i)++;
-	if (!ctx->input[*ctx->i])
-		return (ctx->buf[(*ctx->len)++] = '$', 1);
 	start = *ctx->i;
 	while (ft_isalnum(ctx->input[*ctx->i]) || ctx->input[*ctx->i] == '_')
 		(*ctx->i)++;
+	if (*ctx->i == start)
+		return (ctx->buf[(*ctx->len)++] = '$', 1);
 	key = ft_strndup(ctx->input + start, *ctx->i - start);
 	if (!key)
 		return (0);
