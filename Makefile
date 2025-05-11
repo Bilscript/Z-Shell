@@ -20,10 +20,12 @@ OBJ_DIR = object
 
 SRC     = \
 	src/main.c \
+	src/parse_and_exec.c \
 	src/built-in/ft_cd.c \
 	src/built-in/ft_echo.c \
 	src/built-in/ft_unset.c \
 	src/built-in/ft_exit.c \
+	src/built-in/ft_exit_utils.c \
 	src/built-in/ft_env.c \
 	src/built-in/ft_export.c \
 	src/built-in/ft_pwd.c \
@@ -32,7 +34,8 @@ SRC     = \
 	src/exec/exec.c \
 	src/exec/exec_builtin.c \
 	src/exec/exec_builtin_or_real.c \
-	src/exec/exec_piped_commands.c\
+	src/exec/exec_piped_commands.c \
+	src/exec/exec_piped_commands2.c \
 	src/exec/is_directory.c \
 	src/exec/handle_heredoc.c \
 	src/exec/handle_heredoc2.c \

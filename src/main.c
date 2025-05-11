@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
+/*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/14 12:16:43 by bhamani           #+#    #+#             */
-/*   Updated: 2025/05/11 13:15:30 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/05/11 17:28:03 by slebik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,58 +14,11 @@
 
 int	g_exit_status = 0;
 
-void	parse_and_execute(char *input, t_data *data)
-{
-	t_command	*cmd_save;
-
-	if (!input || !data)
-		return;
-
-	data->token = tokenizer(input, data->env_data.head);
-	if (!data->token || data->token->type == TOKEN_EOF)
-	{
-		free_tokens(data->token);
-		data->token = NULL;
-		free_command(data->cmd);
-		data->cmd = NULL;
-		return;
-	}
-
-	// Sauvegarde pour pouvoir réutiliser si besoin
-	cmd_save = data->cmd;
-	data->cmd = lexer(data->token);
-	if (!data->cmd)
-	{
-		free_tokens(data->token);
-		data->token = NULL;
-		return;
-	}
-
-	exec(data);
-
-	// Nettoyage post-exécution
-	free_tokens(data->token);
-	data->token = NULL;
-
-	if (data->env_data.lenv)
-	{
-		free_tab(data->env_data.lenv);
-		data->env_data.lenv = NULL;
-	}
-	data->env_data.lenv = envp_to_array(data->env_data.head);
-
-	// Nettoyage de la commande exécutée
-	free_command(data->cmd);
-	data->cmd = cmd_save;
-}
-
-
-
-
 t_data	*init_data(char **envp)
 {
 	t_data	*data;
 
+	setup_signals();
 	data = malloc(sizeof(t_data));
 	if (!data)
 		return (NULL);
@@ -87,14 +40,13 @@ t_data	*init_data(char **envp)
 	return (data);
 }
 
-int main(int ac, char **av, char **envp)
+int	main(int ac, char **av, char **envp)
 {
-	char *input;
-	t_data *data;
+	char		*input;
+	t_data		*data;
 
 	(void)ac;
 	(void)av;
-	setup_signals();
 	data = init_data(envp);
 	if (!data)
 		return (1);
@@ -113,53 +65,6 @@ int main(int ac, char **av, char **envp)
 		}
 		free(input);
 	}
-	free_envp_list(&data->env_data);
-	rl_clear_history();
-	free_command(data->cmd);
-	if (data->token)
-	{
-		free_tokens(data->token);
-	}	
-	free(data);
+	free_all(NULL, data);
 	return (0);
 }
-
-
-//MAIN POUR TESTER 
-/*
-int	main(int ac, char **av, char **envp)
-{
-	char		*input;
-	t_envp_list	env_data;
-
-	(void)ac;
-	(void)av;
-	g_exit_status = 0;
-	setup_signals();
-	env_data.head = get_env(envp);
-	env_data.lenv = envp_to_array(env_data.head);
-
-	while (1)
-	{
-		if (isatty(STDIN_FILENO))
-			input = readline("Z-Shell> ");
-		else
-			input = readline("");
-
-		if (!input)
-		{
-			if (isatty(STDIN_FILENO))
-				printf("exit\n");
-			break ;
-		}
-		if (input[0] != '\0')
-		{
-			add_history(input);
-			parse_and_execute(input, &env_data);
-		}
-		free(input);
-	}
-	free_envp_list(&env_data);
-	rl_clear_history();
-	return (0);
-}*/

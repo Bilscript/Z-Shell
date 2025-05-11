@@ -3,50 +3,54 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
+/*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 13:38:30 by bhamani           #+#    #+#             */
-/*   Updated: 2025/05/11 15:43:31 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/05/11 17:20:49 by slebik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	exec(t_data *data)
+static void	setup_signals_ignore(struct sigaction *old_int,
+	struct sigaction *old_quit)
 {
-	t_command	*current;
-	t_command	*next;
+	struct sigaction	ignore;
 
-	if (has_pipe(data->token))
-		exec_piped_commands(data);
-	else
-	{
-		current = data->cmd;
-		while (current)
-		{
-			next = current->next;
-			if (current->cmd)
-				exec_builtin_or_real(data);
-			current = next;
-		}
-	}
+	ignore.sa_handler = SIG_IGN;
+	sigemptyset(&ignore.sa_mask);
+	ignore.sa_flags = 0;
+	sigaction(SIGINT, NULL, old_int);
+	sigaction(SIGQUIT, NULL, old_quit);
+	sigaction(SIGINT, &ignore, NULL);
+	sigaction(SIGQUIT, &ignore, NULL);
+}
+
+static void	restore_signals(struct sigaction *old_int,
+	struct sigaction *old_quit)
+{
+	sigaction(SIGINT, old_int, NULL);
+	sigaction(SIGQUIT, old_quit, NULL);
+}
+
+static void	exec_child_process(char *path, t_data *data)
+{
+	signal(SIGINT, SIG_DFL);
+	signal(SIGQUIT, SIG_DFL);
+	execve(path, data->cmd->args, data->env_data.lenv);
+	perror("execve failed");
+	free(path);
+	exit(126);
 }
 
 static int	fork_and_exec(char *path, t_data *data)
 {
 	pid_t				pid;
 	int					status;
-	struct sigaction	sa_old_int;
-	struct sigaction	sa_old_quit;
-	struct sigaction	sa_ignore;
+	struct sigaction	old_int;
+	struct sigaction	old_quit;
 
-	sa_ignore.sa_handler = SIG_IGN;
-	sigemptyset(&sa_ignore.sa_mask);
-	sa_ignore.sa_flags = 0;
-	sigaction(SIGINT, NULL, &sa_old_int);
-	sigaction(SIGQUIT, NULL, &sa_old_quit);
-	sigaction(SIGINT, &sa_ignore, NULL);
-	sigaction(SIGQUIT, &sa_ignore, NULL);
+	setup_signals_ignore(&old_int, &old_quit);
 	pid = fork();
 	if (pid < 0)
 	{
@@ -56,17 +60,9 @@ static int	fork_and_exec(char *path, t_data *data)
 		return (1);
 	}
 	if (pid == 0)
-	{
-		signal(SIGINT, SIG_DFL);
-		signal(SIGQUIT, SIG_DFL);
-		execve(path, data->cmd->args, data->env_data.lenv);
-		perror("execve failed");
-		free(path);
-		exit(126);
-	}
+		exec_child_process(path, data);
 	waitpid(pid, &status, 0);
-	sigaction(SIGINT, &sa_old_int, NULL);
-	sigaction(SIGQUIT, &sa_old_quit, NULL);
+	restore_signals(&old_int, &old_quit);
 	free(path);
 	if (WIFEXITED(status))
 		g_exit_status = WEXITSTATUS(status);
@@ -84,7 +80,6 @@ void	run_command(t_data *data)
 	path = parsing(data->env_data.head, data->cmd->cmd);
 	if (!check_cmd_path(&path, data->cmd))
 	{
-		free(path);
 		free(path);
 		exit(127);
 	}

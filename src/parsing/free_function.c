@@ -6,7 +6,7 @@
 /*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 11:43:28 by bhamani           #+#    #+#             */
-/*   Updated: 2025/05/09 16:23:21 by slebik           ###   ########.fr       */
+/*   Updated: 2025/05/11 16:09:07 by slebik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,14 +64,14 @@ void	free_command(t_command *cmd)
 {
 	t_command	*next;
 
-	if(cmd)
+	if (cmd)
 	{
 		while (cmd)
 		{
 			next = cmd->next;
-			if(cmd->args)
+			if (cmd->args)
 				free_args(cmd->args);
-			if(cmd->redirs)
+			if (cmd->redirs)
 				free_redirs(cmd->redirs);
 			free(cmd);
 			cmd = next;
@@ -80,7 +80,7 @@ void	free_command(t_command *cmd)
 }
 
 void	free_tab(char **tab)
-{	
+{
 	int	i;
 
 	i = 0;

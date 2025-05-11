@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_builtin_or_real.c                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
+/*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 16:19:39 by slebik            #+#    #+#             */
-/*   Updated: 2025/05/11 15:25:59 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/05/11 16:10:54 by slebik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ void	free_child_data(t_data *data)
 		free_tab(data->env_data.lenv);
 }
 
-static void exec_forked_child(t_data *data)
+static void	exec_forked_child(t_data *data)
 {
 	setup_exec_signals();
 	if (handle_redirections(data->cmd) == -1)
@@ -49,7 +49,7 @@ static void	handle_signal_status(int status)
 		g_exit_status = WEXITSTATUS(status);
 }
 
-static void exec_forked(t_data *data)
+static void	exec_forked(t_data *data)
 {
 	pid_t	pid;
 	int		status;
@@ -64,7 +64,7 @@ static void exec_forked(t_data *data)
 	handle_signal_status(status);
 }
 
-void exec_builtin_or_real(t_data *data)
+void	exec_builtin_or_real(t_data *data)
 {
 	t_stdio_backup	backup;
 

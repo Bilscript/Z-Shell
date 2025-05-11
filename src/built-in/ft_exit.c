@@ -5,78 +5,87 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/05/01 12:49:22 by bhamani           #+#    #+#             */
-/*   Updated: 2025/05/11 13:55:36 by bhamani          ###   ########.fr       */
+/*   Created: 2025/05/11 12:00:00 by bhamani           #+#    #+#             */
+/*   Updated: 2025/05/11 16:51:16 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static void	print_exit_error(char *arg)
+void	print_exit_error(char *arg)
 {
 	ft_putstr_fd("bash: exit: ", 2);
 	ft_putstr_fd(arg, 2);
 	ft_putstr_fd(": numeric argument required\n", 2);
 }
 
-int	is_numeric(const char *str)
+static int	check_overflow(const char *str, int sign)
 {
-	if (*str == '-' || *str == '+')
-		str++;
-	if (!*str)
+	size_t		len;
+	const char	*max_str;
+
+	len = ft_strlen(str);
+	if (sign == 1)
+		max_str = "9223372036854775807";
+	else
+		max_str = "9223372036854775808";
+	if (len > ft_strlen(max_str))
+		return (1);
+	if (len < ft_strlen(max_str))
 		return (0);
-	while (*str)
-	{
-		if (!ft_isdigit(*str))
-			return (0);
-		str++;
-	}
-	return (1);
+	return (ft_strncmp(str, max_str, len) > 0);
 }
 
-long long	ft_atoll(const char *str)
+long long	ft_atoll(const char *str, int *overflow)
 {
 	int			sign;
 	long long	res;
 
 	res = 0;
 	sign = 1;
+	*overflow = 0;
+	while (*str == ' ' || (*str >= '\t' && *str <= '\r'))
+		str++;
 	if (*str == '-' || *str == '+')
-		if (*str++ == '-')
+	{
+		if (*str == '-')
 			sign = -1;
+		str++;
+	}
+	if (check_overflow(str, sign))
+	{
+		*overflow = 1;
+		return (0);
+	}
 	while (*str && ft_isdigit(*str))
 		res = res * 10 + (*str++ - '0');
+	if (*str != '\0')
+		*overflow = 1;
 	return (res * sign);
 }
 
-void	free_all(t_command *cmd, t_data *data)
+static int	is_valid_number(const char *str, int *overflow)
 {
-	if (data)
+	const char	*ptr;
+
+	ptr = str;
+	if (*ptr == '-' || *ptr == '+')
+		ptr++;
+	if (!*ptr)
+		return (0);
+	while (*ptr)
 	{
-		if (data->cmd)
-		{
-			free_command(data->cmd);
-			data->cmd = NULL;
-		}
-		if (data->token)
-		{
-			free_tokens(data->token);
-			data->token = NULL;
-		}
-		free_envp_list(&(data->env_data));
-		free(data);
+		if (!ft_isdigit(*ptr))
+			return (0);
+		ptr++;
 	}
-	if (cmd)
-	{
-		free_command(cmd);
-		cmd = NULL;
-	}
+	ft_atoll(str, overflow);
+	return (!(*overflow));
 }
 
 int	ft_exit(t_command *cmd, t_data *data)
 {
-	long long		num;
-	unsigned char	ret;
+	int	overflow;
 
 	printf("exit\n");
 	if (!cmd->args[1])
@@ -84,20 +93,11 @@ int	ft_exit(t_command *cmd, t_data *data)
 		free_all(NULL, data);
 		exit(EXIT_SUCCESS);
 	}
-	if (!is_numeric(cmd->args[1]))
-	{
-		print_exit_error(cmd->args[1]);
-		free_all(NULL, data);
-		exit(EXIT_BUILTIN_ERROR);
-	}
+	overflow = 0;
+	if (!is_valid_number(cmd->args[1], &overflow))
+		exit_invalid_number(cmd->args[1], data);
 	if (cmd->args[2])
-	{
-		ft_putstr_fd("bash: exit: too many arguments\n", 2);
-		g_exit_status = EXIT_GENERAL_ERROR;
-		return (1);
-	}
-	num = ft_atoll(cmd->args[1]);
-	ret = (unsigned char)(num % 256);
-	free_all(NULL, data);
-	exit(ret);
+		return (handle_too_many_args());
+	exit_with_number(cmd->args[1], data);
+	return (0);
 }

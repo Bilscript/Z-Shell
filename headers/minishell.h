@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
+/*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 22:17:51 by bhamani           #+#    #+#             */
-/*   Updated: 2025/05/09 10:49:07 by bhamani          ###   ########.fr       */
+/*   Updated: 2025/05/11 17:30:54 by slebik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -179,10 +179,14 @@ void			ft_cd(t_command *cmd, t_envp *envp);
 void			ft_export(t_command *cmd, t_envp *envp);
 void			ft_unset(t_command *cmd, t_envp *envp);
 int				ft_exit(t_command *cmd, t_data *data);
+void			print_exit_error(char *arg);
+void			exit_with_number(char *arg, t_data *data);
+long long		ft_atoll(const char *str, int *overflow);
+int				handle_too_many_args(void);
+void			exit_invalid_number(char *arg, t_data *data);
 void			ft_env(t_command *cmd, t_envp *envp);
 int				is_builtin(char *cmd);
 void			exec_builtin(t_command *cmd, t_data *data);
-
 
 // ==========** Environment variables functions **==========
 
@@ -201,6 +205,13 @@ void			run_command(t_data *data);
 void			error(char *error_msg);
 void			exec_piped_commands(t_data *data);
 void			exec_builtin_or_real(t_data *data);
+void			exec_piped_loop(t_command *cmd, t_data *data, int *status);
+void			exec_child(t_command *cmd, int in_fd, int *fd, t_data *data);
+int				pipe_and_fork(t_command *cmd, int *pid, int *fd);
+void			restore_parent_signals(struct sigaction *old_int,
+					struct sigaction *old_quit);
+void			setup_parent_signals(struct sigaction *old_int,
+					struct sigaction *old_quit);
 
 // ==========** Path and command utilities **==========
 
@@ -224,7 +235,8 @@ int				has_heredoc(t_command *cmd);
 // ==========** Pipe and process functions **==========
 
 void			handle_parent(t_command *current, int *in_fd, int *fd);
-void			exec_command_children(t_command *current,int in_fd, t_data *data);
+void			exec_command_children(t_command *current,
+					int in_fd, t_data *data);
 void			prepare_child(t_command *current, int in_fd, int *fd);
 void			here_doc_child(int *fd, char *limiter, t_data *data);
 void			here_doc_parent(int *fd);
@@ -238,6 +250,7 @@ void			setup_signals(void);
 void			setup_exec_signals(void);
 void			setup_heredoc_signals(void);
 void			reset_signals(void);
+void			update_exit_status(int status);
 
 // ==========** Utility functions **==========
 

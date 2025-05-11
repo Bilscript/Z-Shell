@@ -6,11 +6,9 @@
 /*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 17:49:19 by slebik            #+#    #+#             */
-/*   Updated: 2025/05/05 15:52:21 by slebik           ###   ########.fr       */
+/*   Updated: 2025/05/11 16:18:28 by slebik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
-// rename le fichier find path
 
 #include "minishell.h"
 
