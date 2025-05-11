@@ -16,7 +16,6 @@ int	handle_variable(t_parse_ctx *ctx, t_envp *envp)
 {
 	size_t	start;
 	char	*key;
-	char	*val;
 
 	if (!ctx->input[*ctx->i + 1])
 		return (ctx->buf[(*ctx->len)++] = '$', (*ctx->i)++, 1);
@@ -33,11 +32,7 @@ int	handle_variable(t_parse_ctx *ctx, t_envp *envp)
 	key = ft_strndup(ctx->input + start, *ctx->i - start);
 	if (!key)
 		return (0);
-	val = get_value(envp, key);
-	if (val)
-		append_to_buf(ctx, val, ft_strlen(val));
-	else if (ft_isdigit(key[0]))
-		append_to_buf(ctx, key + 1, ft_strlen(key) - 1);
+	append_var_value(ctx, key, envp);
 	free(key);
 	return (1);
 }

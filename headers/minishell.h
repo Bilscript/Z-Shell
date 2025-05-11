@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
+/*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 22:17:51 by bhamani           #+#    #+#             */
-/*   Updated: 2025/05/11 21:40:23 by slebik           ###   ########.fr       */
+/*   Updated: 2025/05/11 23:33:58 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,6 +139,7 @@ int				token_word(char *input, size_t *i, t_token **tokens,
 					t_envp *envp);
 size_t			estimate_token_size(char *input, size_t i, t_envp *envp);
 void			free_tokens(t_token *list);
+int				append_var_value(t_parse_ctx *ctx, char *key, t_envp *envp);
 
 //==========** Parse utilities **==========
 
@@ -178,6 +179,7 @@ void			ft_echo(t_command *cmd);
 void			ft_pwd(void);
 void			ft_cd(t_command *cmd, t_envp *envp);
 void			ft_export(t_command *cmd, t_envp *envp);
+int				set_key(t_envp *envp, char *key, char *value);
 void			ft_unset(t_command *cmd, t_envp *envp);
 int				ft_exit(t_command *cmd, t_data *data);
 void			print_exit_error(char *arg);

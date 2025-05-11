@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   handle_dollar.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
+/*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/11 21:38:02 by slebik            #+#    #+#             */
-/*   Updated: 2025/05/11 21:39:22 by slebik           ###   ########.fr       */
+/*   Updated: 2025/05/11 23:33:39 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,4 +63,16 @@ size_t	handle_dollar(char *input, size_t *i, t_envp *envp)
 	len = get_val_length(key, envp);
 	free(key);
 	return (len);
+}
+
+int	append_var_value(t_parse_ctx *ctx, char *key, t_envp *envp)
+{
+	char	*val;
+
+	val = get_value(envp, key);
+	if (val)
+		append_to_buf(ctx, val, ft_strlen(val));
+	else if (ft_isdigit(key[0]))
+		append_to_buf(ctx, key + 1, ft_strlen(key) - 1);
+	return (1);
 }

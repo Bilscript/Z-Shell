@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_piped_commands2.c                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
+/*   By: bhamani <bhamani@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/11 16:57:03 by slebik            #+#    #+#             */
-/*   Updated: 2025/05/11 16:57:37 by slebik           ###   ########.fr       */
+/*   Updated: 2025/05/11 23:58:58 by bhamani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,8 @@ void	exec_piped_commands(t_data *data)
 	int					status;
 
 	current = data->cmd;
+	if (!prepare_heredocs(data))
+		return ;
 	setup_parent_signals(&old_int, &old_quit);
 	exec_piped_loop(current, data, &status);
 	restore_parent_signals(&old_int, &old_quit);
