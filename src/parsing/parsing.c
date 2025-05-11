@@ -123,7 +123,10 @@ t_token	*tokenizer(char *input, t_envp *envp)
 		else
 		{
 			if (!token_word(input, &i, &tokens, envp))
+			{
+				free_tokens(tokens);
 				return (NULL);
+			}
 		}
 	}
 	add_token(&tokens, new_token(TOKEN_EOF, NULL, 0, QUOTE_NONE));

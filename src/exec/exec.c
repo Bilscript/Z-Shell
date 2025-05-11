@@ -6,7 +6,7 @@
 /*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 13:38:30 by bhamani           #+#    #+#             */
-/*   Updated: 2025/05/11 17:20:49 by slebik           ###   ########.fr       */
+/*   Updated: 2025/05/11 20:01:45 by slebik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,7 +81,7 @@ void	run_command(t_data *data)
 	if (!check_cmd_path(&path, data->cmd))
 	{
 		free(path);
-		exit(127);
+		exit(g_exit_status);
 	}
 	if (fork_and_exec(path, data))
 		exit(g_exit_status);

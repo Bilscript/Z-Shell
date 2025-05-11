@@ -54,6 +54,7 @@ SRC     = \
 	src/parsing/token_list.c \
 	src/parsing/token_utils.c \
 	src/parsing/token_utils2.c \
+	src/parsing/handle_dollar.c \
 	src/sig_management.c
 
 OBJ     = $(SRC:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)

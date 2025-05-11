@@ -6,7 +6,7 @@
 /*   By: slebik <slebik@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 22:17:51 by bhamani           #+#    #+#             */
-/*   Updated: 2025/05/11 17:30:54 by slebik           ###   ########.fr       */
+/*   Updated: 2025/05/11 21:40:23 by slebik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,6 +142,7 @@ void			free_tokens(t_token *list);
 
 //==========** Parse utilities **==========
 
+size_t			handle_dollar(char *input, size_t *i, t_envp *envp);
 int				handle_quotes(t_parse_ctx *ctx, t_envp *envp,
 					t_quote_status *qs);
 int				handle_variable(t_parse_ctx *ctx, t_envp *envp);
